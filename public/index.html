@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Locket Love Studio • Cinematic 3D Experience</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Three.js for Hero 3D Orb & Interactive Parallax -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Canvas Confetti for Delight Moments -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- FontAwesome 6 Pro Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Google Fonts: Syne, Playfair Display & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Playfair Display"', 'serif'],
+            syne: ['"Syne"', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif']
+          },
+          colors: {
+            cinematic: {
+              blush: '#FFE4EF',
+              babypink: '#FFB6D5',
+              rose: '#FF6FA8',
+              hotpink: '#FF2E88',
+              magenta: '#D6106B',
+              deepRaspberry: '#7A0B3F',
+              plum: '#1A0410',
+              plumDeep: '#12020B',
+              champagne: '#FFD9A8',
+              lilac: '#C9A7FF'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* ======================================================== */
+    /* 1. CINEMATIC GRADIENT MESH & ATMOSPHERE                  */
+    /* ======================================================== */
+    body {
+      background-color: #FFF5F9;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(255, 182, 213, 0.45) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(255, 111, 168, 0.35) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(255, 228, 239, 0.5) 0px, transparent 60%),
+        radial-gradient(at 0% 100%, rgba(255, 46, 136, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(255, 217, 168, 0.2) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Film Grain Overlay */
+    .film-grain {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0.038;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* Soft Cinematic Vignette */
+    .cinematic-vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 11;
+      background: radial-gradient(circle at 50% 40%, transparent 60%, rgba(26, 4, 16, 0.08) 100%);
+    }
+
+    /* Volumetric Light Rays behind Hero */
+    .volumetric-rays {
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 650px;
+      height: 650px;
+      background: conic-gradient(from 180deg at 50% 50%, 
+        transparent 0deg, 
+        rgba(255, 111, 168, 0.15) 30deg, 
+        transparent 65deg, 
+        rgba(255, 46, 136, 0.12) 110deg, 
+        transparent 160deg,
+        rgba(255, 217, 168, 0.1) 220deg,
+        transparent 280deg);
+      filter: blur(50px);
+      pointer-events: none;
+      z-index: 0;
+      animation: rotateRays 40s linear infinite;
+    }
+    @keyframes rotateRays {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Background Ambient Floating Petals / Bubbles Canvas */
+    #ambientParallaxCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ======================================================== */
+    /* 2. GLASSMORPHISM CARDS & 3-LAYER GLOW SHADOWS            */
+    /* ======================================================== */
+    .cinematic-glass-card {
+      background: rgba(255, 255, 255, 0.84);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      /* 1px Inner Highlight Border */
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      /* 3-Layer Shadow: 1. Ambient Key, 2. Soft Plum Depth, 3. Pink Glow */
+      box-shadow: 
+        0 10px 30px -5px rgba(26, 4, 16, 0.05),
+        0 25px 60px -15px rgba(255, 46, 136, 0.18),
+        0 0 35px 0 rgba(255, 111, 168, 0.14),
+        inset 0 1px 2px rgba(255, 255, 255, 0.95);
+      position: relative;
+    }
+
+    /* Moving Specular Sheen for 3D Tilt */
+    .specular-sheen {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.45), transparent 75%);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      mix-blend-mode: overlay;
+    }
+    .tilt-card:hover .specular-sheen {
+      opacity: 1;
+    }
+
+    /* 3D Widget Chassis */
+    .widget-chassis-3d {
+      box-shadow: 
+        0 25px 60px -10px rgba(26, 4, 16, 0.32),
+        0 0 0 1px rgba(255, 255, 255, 0.8),
+        0 0 25px rgba(255, 46, 136, 0.2),
+        inset 0 2px 5px rgba(255, 255, 255, 0.9);
+    }
+
+    /* ======================================================== */
+    /* 3. INPUT OVERRIDES: REMOVE BLUE & AUTOFILL STYLING       */
+    /* ======================================================== */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus,
+    textarea:-webkit-autofill,
+    textarea:-webkit-autofill:hover,
+    textarea:-webkit-autofill:focus {
+      -webkit-text-fill-color: #1A0410 !important;
+      -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.96) inset !important;
+      box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.96) inset !important;
+      border: 1.5px solid #FF6FA8 !important;
+      transition: background-color 5000s ease-in-out 0s !important;
+    }
+    
+    .cinematic-input {
+      background: rgba(255, 255, 255, 0.92) !important;
+      border: 1.5px solid #FBCFE8 !important;
+      color: #1A0410 !important;
+      box-shadow: 0 2px 6px rgba(255, 46, 136, 0.04), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    .cinematic-input:focus {
+      background: #FFFFFF !important;
+      border-color: #FF2E88 !important;
+      box-shadow: 0 0 0 4px rgba(255, 46, 136, 0.18), 0 4px 18px rgba(255, 46, 136, 0.12) !important;
+      outline: none !important;
+    }
+
+    /* ======================================================== */
+    /* 4. BUTTONS: MAGNETIC, LIGHT SWEEP & SHIMMER              */
+    /* ======================================================== */
+    .btn-lux-magnetic {
+      background: linear-gradient(135deg, #FF2E88 0%, #FF6FA8 50%, #D6106B 100%);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 32px -6px rgba(255, 46, 136, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+    }
+    .btn-lux-magnetic:hover {
+      box-shadow: 0 18px 45px -8px rgba(255, 46, 136, 0.68), 0 0 25px rgba(255, 111, 168, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+    .btn-lux-magnetic::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(60deg, transparent 40%, rgba(255, 255, 255, 0.45) 50%, transparent 60%);
+      transform: rotate(35deg) translateX(-140%);
+      transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-lux-magnetic:hover::after {
+      transform: rotate(35deg) translateX(140%);
+    }
+
+    /* ======================================================== */
+    /* 5. CUSTOM SMOOTH GLOWING CURSOR                          */
+    /* ======================================================== */
+    #cursorDot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 8px;
+      background: #FF2E88;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 12px #FF2E88, 0 0 24px #FF6FA8;
+    }
+    #cursorRing {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 40px;
+      height: 40px;
+      border: 1.5px solid rgba(255, 46, 136, 0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s, border-color 0.2s;
+    }
+    body.cursor-hover #cursorRing {
+      width: 62px;
+      height: 62px;
+      border-color: #FF2E88;
+      background: rgba(255, 46, 136, 0.1);
+      backdrop-filter: blur(2px);
+    }
+
+    /* ======================================================== */
+    /* 6. STAGGER ENTRANCE ANIMATIONS                           */
+    /* ======================================================== */
+    @keyframes staggerReveal {
+      from {
+        opacity: 0;
+        transform: translateY(28px) scale(0.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .reveal-stagger-1 { animation: staggerReveal 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both; }
+    .reveal-stagger-2 { animation: staggerReveal 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both; }
+    .reveal-stagger-3 { animation: staggerReveal 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.36s both; }
+    .reveal-stagger-4 { animation: staggerReveal 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.50s both; }
+
+    /* Preloader */
+    #preloader {
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.65s;
+    }
+    #preloader.preloader-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Perspective container */
+    .perspective-stage {
+      perspective: 1400px;
+    }
+
+    /* ======================================================== */
+    /* 7. FLOATING WIDGET STACK (CINEMATIC 3D PERSPECTIVE)     */
+    /* ======================================================== */
+    .preserve-3d {
+      transform-style: preserve-3d;
+    }
+
+    .widget-stack-stage {
+      perspective: 1100px;
+      transform-style: preserve-3d;
+    }
+
+    .widget-stack-group {
+      transform-style: preserve-3d;
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+
+    /* 3-Layer Drop Shadow + Pink Glow */
+    .widget-card-shadow {
+      box-shadow: 
+        0 10px 25px -4px rgba(26, 4, 16, 0.16),
+        0 22px 45px -8px rgba(255, 46, 136, 0.28),
+        0 0 35px rgba(255, 111, 168, 0.24),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+    }
+
+    .widget-card {
+      position: absolute;
+      transform-style: preserve-3d;
+      will-change: transform;
+      user-select: none;
+      transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+    }
+
+    /* ======================================================== */
+    /* 3D FAN-SHAPED WIDGET STACK                               */
+    /* ======================================================== */
+    .widget-stack-stage {
+      perspective: 1200px;
+      touch-action: pan-y;
+      cursor: grab;
+      user-select: none;
+    }
+    .widget-stack-stage.is-dragging {
+      cursor: grabbing;
+    }
+
+    .widget-stack-group {
+      transform-style: preserve-3d;
+      transition: transform 0.2s ease-out;
+    }
+
+    .widget-fan-card {
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border-radius: 28px;
+      border: 6px solid #FFFFFF;
+      overflow: hidden;
+      user-select: none;
+      transform-origin: 50% 120%;
+      will-change: transform, box-shadow, opacity, filter;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.35s ease,
+                  opacity 0.35s ease,
+                  filter 0.35s ease;
+      cursor: pointer;
+    }
+
+    @media (min-width: 640px) {
+      .widget-fan-card {
+        width: 165px;
+        height: 165px;
+        border-radius: 32px;
+        border-width: 7px;
+      }
+    }
+
+    /* CARD 0 (LEFT) - DEFAULT / CARD 1 ACTIVE */
+    .widget-stack-group.active-card-1 .card-fan-0 {
+      transform: translate3d(-75px, 8px, 10px) rotateZ(-17deg) scale(0.86);
+      z-index: 15;
+      opacity: 0.82;
+      filter: brightness(0.94);
+      box-shadow: 0 16px 36px -6px rgba(26, 4, 16, 0.2), 0 0 20px rgba(255, 46, 136, 0.15);
+    }
+    /* CARD 1 (MID) - PROMINENT EXPANDED */
+    .widget-stack-group.active-card-1 .card-fan-1 {
+      transform: translate3d(0px, -28px, 60px) rotateZ(0deg) scale(1.24);
+      z-index: 40;
+      opacity: 1;
+      filter: brightness(1.02);
+      box-shadow: 0 32px 75px -10px rgba(255, 46, 136, 0.52), 0 0 45px rgba(255, 111, 168, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 1);
+    }
+    /* CARD 2 (RIGHT) - DEFAULT / CARD 1 ACTIVE */
+    .widget-stack-group.active-card-1 .card-fan-2 {
+      transform: translate3d(75px, 8px, 10px) rotateZ(17deg) scale(0.86);
+      z-index: 15;
+      opacity: 0.82;
+      filter: brightness(0.94);
+      box-shadow: 0 16px 36px -6px rgba(26, 4, 16, 0.2), 0 0 20px rgba(255, 46, 136, 0.15);
+    }
+
+    /* WHEN CARD 0 (LEFT) IS EXPANDED */
+    .widget-stack-group.active-card-0 .card-fan-0 {
+      transform: translate3d(-60px, -28px, 60px) rotateZ(0deg) scale(1.24);
+      z-index: 40;
+      opacity: 1;
+      filter: brightness(1.02);
+      box-shadow: 0 32px 75px -10px rgba(255, 46, 136, 0.52), 0 0 45px rgba(255, 111, 168, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 1);
+    }
+    .widget-stack-group.active-card-0 .card-fan-1 {
+      transform: translate3d(25px, 8px, 20px) rotateZ(10deg) scale(0.86);
+      z-index: 20;
+      opacity: 0.80;
+      filter: brightness(0.92);
+      box-shadow: 0 16px 36px -6px rgba(26, 4, 16, 0.2);
+    }
+    .widget-stack-group.active-card-0 .card-fan-2 {
+      transform: translate3d(95px, 16px, 0px) rotateZ(22deg) scale(0.80);
+      z-index: 10;
+      opacity: 0.70;
+      filter: brightness(0.88);
+      box-shadow: 0 12px 28px -6px rgba(26, 4, 16, 0.16);
+    }
+
+    /* WHEN CARD 2 (RIGHT) IS EXPANDED */
+    .widget-stack-group.active-card-2 .card-fan-0 {
+      transform: translate3d(-95px, 16px, 0px) rotateZ(-22deg) scale(0.80);
+      z-index: 10;
+      opacity: 0.70;
+      filter: brightness(0.88);
+      box-shadow: 0 12px 28px -6px rgba(26, 4, 16, 0.16);
+    }
+    .widget-stack-group.active-card-2 .card-fan-1 {
+      transform: translate3d(-25px, 8px, 20px) rotateZ(-10deg) scale(0.86);
+      z-index: 20;
+      opacity: 0.80;
+      filter: brightness(0.92);
+      box-shadow: 0 16px 36px -6px rgba(26, 4, 16, 0.2);
+    }
+    .widget-stack-group.active-card-2 .card-fan-2 {
+      transform: translate3d(60px, -28px, 60px) rotateZ(0deg) scale(1.24);
+      z-index: 40;
+      opacity: 1;
+      filter: brightness(1.02);
+      box-shadow: 0 32px 75px -10px rgba(255, 46, 136, 0.52), 0 0 45px rgba(255, 111, 168, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 1);
+    }
+
+    /* Desktop Responsive adjustments */
+    @media (min-width: 640px) {
+      .widget-stack-group.active-card-1 .card-fan-0 {
+        transform: translate3d(-95px, 10px, 10px) rotateZ(-18deg) scale(0.86);
+      }
+      .widget-stack-group.active-card-1 .card-fan-1 {
+        transform: translate3d(0px, -34px, 60px) rotateZ(0deg) scale(1.25);
+      }
+      .widget-stack-group.active-card-1 .card-fan-2 {
+        transform: translate3d(95px, 10px, 10px) rotateZ(18deg) scale(0.86);
+      }
+
+      .widget-stack-group.active-card-0 .card-fan-0 {
+        transform: translate3d(-75px, -34px, 60px) rotateZ(0deg) scale(1.25);
+      }
+      .widget-stack-group.active-card-0 .card-fan-1 {
+        transform: translate3d(32px, 10px, 20px) rotateZ(12deg) scale(0.86);
+      }
+      .widget-stack-group.active-card-0 .card-fan-2 {
+        transform: translate3d(115px, 20px, 0px) rotateZ(24deg) scale(0.80);
+      }
+
+      .widget-stack-group.active-card-2 .card-fan-0 {
+        transform: translate3d(-115px, 20px, 0px) rotateZ(-24deg) scale(0.80);
+      }
+      .widget-stack-group.active-card-2 .card-fan-1 {
+        transform: translate3d(-32px, 10px, 20px) rotateZ(-12deg) scale(0.86);
+      }
+      .widget-stack-group.active-card-2 .card-fan-2 {
+        transform: translate3d(75px, -34px, 60px) rotateZ(0deg) scale(1.25);
+      }
+    }
+
+    /* Diagonal Specular Sheen Sweep */
+    .widget-sheen-sweep {
+      position: absolute;
+      inset: -50%;
+      background: linear-gradient(
+        120deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.08) 45%,
+        rgba(255, 255, 255, 0.55) 50%,
+        rgba(255, 255, 255, 0.08) 55%,
+        transparent 65%
+      );
+      transform: translateX(-120%) rotate(25deg);
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    .sweep-active {
+      animation: sweepAnim 6s ease-in-out infinite;
+    }
+    @keyframes sweepAnim {
+      0% { transform: translateX(-120%) rotate(25deg); }
+      32%, 100% { transform: translateX(140%) rotate(25deg); }
+    }
+
+    /* Floating Glass Badges */
+    .floating-glass-badge {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 8px 24px -4px rgba(255, 46, 136, 0.22), 0 2px 6px rgba(0, 0, 0, 0.06);
+      transform-style: preserve-3d;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+      will-change: transform;
+    }
+    .floating-glass-badge:hover {
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 12px 30px -4px rgba(255, 46, 136, 0.35);
+      transform: scale(1.05) translateZ(105px) !important;
+    }
+
+    /* Staggered entrance drop-in */
+    .widget-drop-1 {
+      animation: widgetDropIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0ms both;
+    }
+    .widget-drop-2 {
+      animation: widgetDropIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
+    }
+    .widget-drop-3 {
+      animation: widgetDropIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) 240ms both;
+    }
+    @keyframes widgetDropIn {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, -60px, -40px) scale(0.75);
+      }
+    }
+
+    /* Depth of Field Bokeh & Petal elements */
+    .dof-petal {
+      position: absolute;
+      border-radius: 50% 10% 50% 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 111, 168, 0.7), rgba(255, 46, 136, 0.25));
+      pointer-events: none;
+      animation: floatPetal 8s cubic-bezier(0.16, 1, 0.3, 1) infinite ease-in-out;
+    }
+    @keyframes floatPetal {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(12px, -16px) rotate(22deg); }
+    }
+
+    /* In-App Captions Pills */
+    .locket-cap-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 0.42rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
+      background: #27272A;
+      color: #F4F4F5;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+    .locket-cap-pill:hover {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    }
+    .locket-cap-pill:active {
+      transform: scale(0.96);
+    }
+    .active-locket-cap {
+      border: 2px solid #FACC15 !important;
+      box-shadow: 0 0 14px rgba(250, 204, 21, 0.6) !important;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 46, 136, 0.3);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  </style>
+</head>
+<body class="text-gray-900 min-h-screen font-sans selection:bg-cinematic-hotpink selection:text-white relative overflow-x-hidden">
+
+  <!-- Layer 1: Film Grain Overlay -->
+  <div class="film-grain"></div>
+  
+  <!-- Layer 2: Cinematic Vignette -->
+  <div class="cinematic-vignette"></div>
+
+  <!-- Layer 3: Ambient Floating Bubbles & Petals Parallax Canvas -->
+  <canvas id="ambientParallaxCanvas"></canvas>
+
+  <!-- Glowing Cursor for Desktop -->
+  <div id="cursorDot" class="hidden md:block"></div>
+  <div id="cursorRing" class="hidden md:block"></div>
+
+  <!-- ======================================================== -->
+  <!-- CINEMATIC PRELOADER (< 1.2s skippable)                   -->
+  <!-- ======================================================== -->
+  <div id="preloader" class="fixed inset-0 bg-cinematic-plum z-[100] flex flex-col items-center justify-center cursor-pointer select-none">
+    <div class="relative flex flex-col items-center text-center space-y-6">
+      <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-cinematic-hotpink via-cinematic-rose to-cinematic-champagne flex items-center justify-center text-white text-3xl shadow-[0_0_35px_rgba(255,46,136,0.6)] animate-pulse">
+        <i class="fa-solid fa-heart"></i>
+      </div>
+      <div>
+        <h2 class="font-display italic text-3xl sm:text-4xl text-white font-bold tracking-tight">
+          Locket <span class="text-cinematic-rose">Cinematic</span>
+        </h2>
+        <p class="text-xs font-mono tracking-widest text-cinematic-babypink/80 uppercase mt-2">Loading Studio Experience</p>
+      </div>
+      <div class="w-48 h-1 bg-white/15 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-cinematic-rose to-cinematic-hotpink w-full animate-pulse"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- CLEAN GLASS NAVBAR (All background orbs moved behind)    -->
+  <!-- ======================================================== -->
+  <header class="sticky top-0 z-40 px-4 sm:px-8 py-3.5 transition-all duration-300">
+    <div class="max-w-6xl mx-auto cinematic-glass-card rounded-2xl px-5 sm:px-7 py-3 flex items-center justify-between">
+      
+      <!-- Brand & Badge -->
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cinematic-hotpink to-cinematic-rose flex items-center justify-center text-white text-lg shadow-md shadow-pink-500/30 transition-transform duration-300 hover:scale-105 active:scale-95">
+          <i class="fa-solid fa-camera-retro"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-display font-extrabold text-xl tracking-tight text-cinematic-plum">
+              Locket <span class="font-syne text-cinematic-hotpink text-lg tracking-normal uppercase">Studio</span>
+            </h1>
+            <span class="text-[10px] font-mono font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-gradient-to-r from-cinematic-rose/20 to-cinematic-hotpink/20 text-cinematic-hotpink border border-cinematic-hotpink/30">
+              3D Cinematic
+            </span>
+          </div>
+          <p class="text-[11px] font-semibold text-gray-700 hidden sm:block">Trải nghiệm đăng tải điện ảnh 3D cho widget Locket</p>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex items-center gap-1.5 bg-pink-100/70 p-1 rounded-2xl border border-pink-200/80">
+        <a href="/" class="px-3.5 py-1.5 rounded-xl bg-white text-cinematic-hotpink text-xs font-extrabold shadow-xs transition flex items-center gap-1.5">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Đăng ảnh</span>
+        </a>
+        <a href="/gold" class="px-3.5 py-1.5 rounded-xl text-gray-700 hover:text-cinematic-hotpink text-xs font-extrabold transition flex items-center gap-1.5">
+          <i class="fa-solid fa-crown text-amber-500"></i>
+          <span>Locket Gold</span>
+        </a>
+      </nav>
+
+      <!-- Live Authentic Auth Status Pill -->
+      <div id="authStatusBadge" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs bg-white/95 text-cinematic-rose border border-pink-200 font-extrabold shadow-xs transition-all duration-300">
+        <span class="relative flex h-2.5 w-2.5">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cinematic-hotpink"></span>
+        </span>
+        <span id="authStatusText">Chưa kết nối tài khoản</span>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- MAIN CINEMATIC WORKSPACE                                 -->
+  <!-- ======================================================== -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-8 py-6 space-y-8 relative z-20 perspective-stage">
+
+    <!-- ======================================================== -->
+    <!-- HERO SECTION: EDITORIAL LEFT + REAL 3D ORB RIGHT          -->
+    <!-- ======================================================== -->
+    <section class="reveal-stagger-1 relative py-6 flex flex-col lg:flex-row items-center justify-between gap-8">
+      
+      <!-- Volumetric Light Rays (Behind Hero Only, z-index 0) -->
+      <div class="volumetric-rays"></div>
+
+      <!-- Left: Big Typography & Description -->
+      <div class="space-y-4 max-w-2xl text-center lg:text-left z-10">
+        <div class="inline-flex items-center gap-2 text-xs font-mono font-extrabold tracking-wider uppercase text-cinematic-hotpink bg-white/90 px-3.5 py-1.5 rounded-full shadow-xs border border-pink-200">
+          <i class="fa-solid fa-wand-magic-sparkles text-cinematic-rose"></i>
+          <span>Official Locket API v2 Pipeline</span>
+        </div>
+        
+        <h2 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-cinematic-plum leading-[1.08] tracking-tight">
+          Khoảnh khắc <span class="italic font-normal bg-gradient-to-r from-cinematic-hotpink via-cinematic-magenta to-cinematic-rose bg-clip-text text-transparent">điện ảnh</span> chạm đến widget.
+        </h2>
+        
+        <p class="text-sm sm:text-base text-gray-700 font-medium leading-relaxed max-w-xl">
+          Đăng ảnh & video chuẩn tỉ lệ widget Locket với caption dài bất tận. Trải nghiệm không gian 3D tương tác sống động, chân thực đến từng chuyển động.
+        </p>
+
+        <!-- FLOATING WIDGET STACK (CINEMATIC 3D PERSPECTIVE) -->
+        <div id="statsBlock" class="relative w-full max-w-[500px] h-[260px] sm:h-[285px] my-3 pt-2 select-none mx-auto lg:mx-0 preserve-3d">
+          
+          <!-- Radial Pink Atmosphere Glow Behind Stack -->
+          <div class="absolute inset-0 -top-6 -bottom-6 -left-6 -right-6 rounded-full bg-gradient-to-r from-pink-300/35 via-rose-300/25 to-pink-200/15 blur-2xl pointer-events-none -z-10"></div>
+          
+          <!-- Depth-of-Field Bokeh & Petal accents (pure HTML/CSS, zero edge-clipping) -->
+          <div class="dof-petal w-5 h-5 -top-2 left-6 blur-[1px] opacity-75" style="animation-delay: 0s;"></div>
+          <div class="dof-petal w-8 h-8 top-16 -right-3 blur-[3px] opacity-50" style="animation-delay: -2.5s;"></div>
+          <div class="dof-petal w-4 h-4 bottom-2 left-10 blur-[1.5px] opacity-60" style="animation-delay: -4.5s;"></div>
+          <div class="dof-petal w-10 h-10 -bottom-4 right-1/4 blur-[5px] opacity-40" style="animation-delay: -1.2s;"></div>
+
+          <!-- Interactive 3D Stack Stage -->
+          <div id="widgetStackStage" class="widget-stack-stage relative w-full h-full flex items-center justify-center pointer-events-auto">
+            <div id="widgetStackGroup" class="widget-stack-group active-card-1 relative w-full h-full flex items-center justify-center">
+
+              <!-- CARD 0: LEFT FAN WIDGET -->
+              <div class="widget-fan-card card-fan-0 group" data-fan-index="0">
+                <!-- User Provided Image -->
+                <img id="widgetSlotImg0" src="" alt="Ảnh widget của bạn 1" class="w-full h-full object-cover hidden" />
+                
+                <!-- Empty Placeholder (Gradient hồng nhạt #FFE4EF -> #FFB6D5 + Camera Icon + Chữ "Ảnh của bạn") -->
+                <div id="widgetEmpty0" class="w-full h-full flex flex-col items-center justify-center p-3 text-center" style="background: linear-gradient(135deg, #FFE4EF 0%, #FFB6D5 100%);">
+                  <div class="w-9 h-9 rounded-2xl bg-white/80 backdrop-blur-sm flex items-center justify-center text-cinematic-hotpink shadow-xs">
+                    <i class="fa-solid fa-camera text-sm"></i>
+                  </div>
+                  <span class="text-[10px] sm:text-[11px] font-extrabold text-[#D6106B] tracking-wide mt-1.5 drop-shadow-xs">Ảnh của bạn</span>
+                </div>
+
+                <!-- Hover Upload Button -->
+                <button type="button" class="btn-slot-upload absolute top-2 right-2 w-7 h-7 rounded-xl bg-white/95 hover:bg-white text-cinematic-hotpink shadow-md border border-pink-200 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95 transition-all duration-200 z-30 cursor-pointer" title="Tải ảnh lên khung này" data-slot="0">
+                  <i class="fa-solid fa-arrow-up-from-bracket text-[10px]"></i>
+                </button>
+                <input type="file" id="slotFileInput0" accept="image/*" class="slot-file-input hidden" data-slot="0">
+
+                <!-- Top Badge -->
+                <div class="absolute top-2 left-2 bg-black/40 backdrop-blur-md px-2 py-0.5 rounded-full text-[9px] font-bold text-white flex items-center gap-1 shadow-sm pointer-events-none">
+                  <i class="fa-solid fa-heart text-cinematic-hotpink text-[8px]"></i>
+                  <span>Besties</span>
+                </div>
+
+                <!-- Specular Sheen Sweep -->
+                <div class="widget-sheen-sweep sweep-active pointer-events-none" style="animation-delay: -1s;"></div>
+              </div>
+
+              <!-- CARD 1: CENTER FAN WIDGET (DEFAULT EXPANDED) -->
+              <div class="widget-fan-card card-fan-1 group" data-fan-index="1">
+                <!-- User Provided Image -->
+                <img id="widgetSlotImg1" src="" alt="Ảnh widget của bạn 2" class="w-full h-full object-cover hidden" />
+                
+                <!-- Empty Placeholder (Gradient hồng nhạt #FFE4EF -> #FFB6D5 + Camera Icon + Chữ "Ảnh của bạn") -->
+                <div id="widgetEmpty1" class="w-full h-full flex flex-col items-center justify-center p-3 text-center" style="background: linear-gradient(135deg, #FFE4EF 0%, #FFB6D5 100%);">
+                  <div class="w-9 h-9 rounded-2xl bg-white/80 backdrop-blur-sm flex items-center justify-center text-cinematic-hotpink shadow-xs">
+                    <i class="fa-solid fa-camera text-sm"></i>
+                  </div>
+                  <span class="text-[10px] sm:text-[11px] font-extrabold text-[#D6106B] tracking-wide mt-1.5 drop-shadow-xs">Ảnh của bạn</span>
+                </div>
+
+                <!-- Hover Upload Button -->
+                <button type="button" class="btn-slot-upload absolute top-2 right-2 w-7 h-7 rounded-xl bg-white/95 hover:bg-white text-cinematic-hotpink shadow-md border border-pink-200 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95 transition-all duration-200 z-30 cursor-pointer" title="Tải ảnh lên khung này" data-slot="1">
+                  <i class="fa-solid fa-arrow-up-from-bracket text-[10px]"></i>
+                </button>
+                <input type="file" id="slotFileInput1" accept="image/*" class="slot-file-input hidden" data-slot="1">
+
+                <!-- Top Badge -->
+                <div class="absolute top-2 left-2 bg-black/40 backdrop-blur-md px-2 py-0.5 rounded-full text-[9px] font-bold text-white flex items-center gap-1 shadow-sm pointer-events-none">
+                  <i class="fa-solid fa-bolt text-amber-300 text-[8px]"></i>
+                  <span>Live</span>
+                </div>
+
+                <!-- Specular Sheen Sweep -->
+                <div class="widget-sheen-sweep sweep-active pointer-events-none" style="animation-delay: -3s;"></div>
+              </div>
+
+              <!-- CARD 2: RIGHT FAN WIDGET -->
+              <div class="widget-fan-card card-fan-2 group" data-fan-index="2">
+                <!-- User Provided Image -->
+                <img id="widgetSlotImg2" src="" alt="Ảnh widget của bạn 3" class="w-full h-full object-cover hidden" />
+                
+                <!-- Empty Placeholder (Gradient hồng nhạt #FFE4EF -> #FFB6D5 + Camera Icon + Chữ "Ảnh của bạn") -->
+                <div id="widgetEmpty2" class="w-full h-full flex flex-col items-center justify-center p-3 text-center" style="background: linear-gradient(135deg, #FFE4EF 0%, #FFB6D5 100%);">
+                  <div class="w-10 h-10 rounded-2xl bg-white/80 backdrop-blur-sm flex items-center justify-center text-cinematic-hotpink shadow-xs">
+                    <i class="fa-solid fa-camera text-base"></i>
+                  </div>
+                  <span class="text-[11px] sm:text-[12px] font-extrabold text-[#D6106B] tracking-wide mt-1.5 drop-shadow-xs">Ảnh của bạn</span>
+                </div>
+
+                <!-- Hover Upload Button -->
+                <button type="button" class="btn-slot-upload absolute top-2 right-2 w-7 h-7 rounded-xl bg-white/95 hover:bg-white text-cinematic-hotpink shadow-md border border-pink-200 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95 transition-all duration-200 z-30 cursor-pointer" title="Tải ảnh lên khung này" data-slot="2">
+                  <i class="fa-solid fa-arrow-up-from-bracket text-[10px]"></i>
+                </button>
+                <input type="file" id="slotFileInput2" accept="image/*" class="slot-file-input hidden" data-slot="2">
+
+                <!-- Bottom Caption Pill -->
+                <div class="absolute bottom-2 left-2 right-2 bg-black/45 backdrop-blur-md py-1 px-2.5 rounded-xl text-center shadow-sm pointer-events-none">
+                  <span class="text-[10px] font-bold text-white tracking-wide flex items-center justify-center gap-1">
+                    <span>Golden Hour ✨</span>
+                  </span>
+                </div>
+
+                <!-- Specular Sheen Sweep -->
+                <div class="widget-sheen-sweep sweep-active pointer-events-none" style="animation-delay: -5s;"></div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- REQUIREMENT 1: HERO BÊN PHẢI - REAL 3D PINK ORB/BLOB (THREE.JS) -->
+      <div class="relative w-full sm:w-[380px] lg:w-[420px] h-[320px] sm:h-[380px] flex items-center justify-center z-10">
+        
+        <!-- Three.js Real-time 3D Canvas -->
+        <canvas id="hero3DCanvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+        
+        <!-- CSS 3D Fallback if WebGL fails -->
+        <div id="hero3DFallback" class="hidden absolute inset-4 rounded-full bg-gradient-to-tr from-cinematic-hotpink via-cinematic-rose to-cinematic-champagne shadow-[0_20px_50px_rgba(255,46,136,0.4)] animate-pulse flex items-center justify-center border-4 border-white/80">
+          <div class="text-white text-center p-4">
+            <i class="fa-solid fa-gem text-4xl mb-2"></i>
+            <p class="font-display font-bold text-sm">3D Pink Gemstone</p>
+          </div>
+        </div>
+
+        <!-- Floating Badge under 3D Orb -->
+        <div class="absolute bottom-2 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[11px] font-bold text-cinematic-plum border border-pink-200 shadow-sm flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-cinematic-hotpink animate-ping"></span>
+          <span>Di chuyển chuột để tương tác 3D</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- SECTION 1: AUTHENTICATION & REAL IDENTITY CARD           -->
+    <!-- ======================================================== -->
+    <section id="authSection" class="reveal-stagger-2 cinematic-glass-card tilt-card rounded-[2.5rem] p-6 sm:p-8 transition-all duration-500 relative overflow-hidden">
+      <!-- Specular Highlight Layer -->
+      <div class="specular-sheen"></div>
+
+      <!-- Card Title & Mode Tabs -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-pink-100/80 pb-5">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-pink-100 to-rose-100 text-cinematic-hotpink flex items-center justify-center text-xl shadow-inner">
+            <i class="fa-solid fa-fingerprint"></i>
+          </div>
+          <div>
+            <h3 id="authCardTitle" class="font-display font-bold text-xl text-cinematic-plum">Xác thực Tài khoản Locket</h3>
+            <p id="authCardSubtitle" class="text-xs font-semibold text-gray-700">Đăng nhập tài khoản thật để đồng bộ hồ sơ Locket chính chủ</p>
+          </div>
+        </div>
+
+        <!-- Auth Mode Toggle Switcher -->
+        <div id="authNavTabs" class="flex bg-pink-100/70 p-1 rounded-2xl border border-pink-200/80 text-xs font-bold">
+          <button id="btnTabAuthLogin" class="px-4 py-2 rounded-xl bg-white text-cinematic-hotpink shadow-sm transition-all duration-300 flex items-center gap-2">
+            <i class="fa-solid fa-envelope"></i>
+            <span>Email & Mật khẩu</span>
+          </button>
+          <button id="btnTabAuthToken" class="px-4 py-2 rounded-xl text-gray-700 hover:text-cinematic-hotpink transition-all duration-300 flex items-center gap-2">
+            <i class="fa-solid fa-key"></i>
+            <span>Dán Token</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- FORM A: Email & Password (REQUIREMENT 4: NO BLUE BACKGROUND) -->
+      <form id="loginForm" class="mt-6 space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-extrabold text-gray-800 uppercase tracking-wider">Email Locket</label>
+              <span class="text-[11px] text-cinematic-hotpink font-bold hidden sm:inline-flex items-center gap-1">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Đuôi mail nhanh
+              </span>
+            </div>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-cinematic-rose"><i class="fa-solid fa-envelope"></i></span>
+              <input type="email" id="inputEmail" required autocomplete="off" placeholder="Nhập email Locket của bạn..." value="" class="cinematic-input w-full rounded-2xl pl-11 pr-4 py-3.5 text-sm font-medium">
+            </div>
+
+            <!-- Quick Email Domain Suggestions -->
+            <div class="flex items-center flex-wrap gap-1.5 pt-1">
+              <span class="text-[10px] font-extrabold text-gray-700 uppercase tracking-wider mr-0.5 flex items-center gap-1">
+                <i class="fa-solid fa-bolt text-amber-500"></i> Gợi ý:
+              </span>
+              <button type="button" class="btn-email-domain px-2.5 py-1 rounded-xl text-xs font-bold bg-white/95 hover:bg-pink-100/90 text-cinematic-plum border border-pink-200 shadow-xs transition-all hover:scale-105 active:scale-95 flex items-center gap-1" data-domain="@gmail.com">
+                <i class="fa-brands fa-google text-rose-500 text-[10px]"></i>
+                <span>@gmail.com</span>
+              </button>
+              <button type="button" class="btn-email-domain px-2.5 py-1 rounded-xl text-xs font-bold bg-white/95 hover:bg-pink-100/90 text-cinematic-plum border border-pink-200 shadow-xs transition-all hover:scale-105 active:scale-95 flex items-center gap-1" data-domain="@icloud.com">
+                <i class="fa-brands fa-apple text-gray-700 text-[11px]"></i>
+                <span>@icloud.com</span>
+              </button>
+              <button type="button" class="btn-email-domain px-2.5 py-1 rounded-xl text-xs font-bold bg-white/95 hover:bg-pink-100/90 text-cinematic-plum border border-pink-200 shadow-xs transition-all hover:scale-105 active:scale-95 flex items-center gap-1" data-domain="@outlook.com">
+                <i class="fa-brands fa-microsoft text-sky-500 text-[10px]"></i>
+                <span>@outlook.com</span>
+              </button>
+              <button type="button" class="btn-email-domain px-2.5 py-1 rounded-xl text-xs font-bold bg-white/95 hover:bg-pink-100/90 text-cinematic-plum border border-pink-200 shadow-xs transition-all hover:scale-105 active:scale-95 flex items-center gap-1" data-domain="@yahoo.com">
+                <i class="fa-brands fa-yahoo text-purple-600 text-[10px]"></i>
+                <span>@yahoo.com</span>
+              </button>
+              <button type="button" class="btn-email-domain px-2.5 py-1 rounded-xl text-xs font-bold bg-white/95 hover:bg-pink-100/90 text-cinematic-plum border border-pink-200 shadow-xs transition-all hover:scale-105 active:scale-95 flex items-center gap-1" data-domain="@hotmail.com">
+                <span>@hotmail.com</span>
+              </button>
+            </div>
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-xs font-extrabold text-gray-800 uppercase tracking-wider">Mật khẩu Locket</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-cinematic-rose"><i class="fa-solid fa-lock"></i></span>
+              <input type="password" id="inputPassword" required autocomplete="new-password" placeholder="Nhập mật khẩu Locket của bạn..." value="" class="cinematic-input w-full rounded-2xl pl-11 pr-4 py-3.5 text-sm font-medium">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+          <p class="text-xs font-semibold text-gray-700 flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-emerald-600 text-sm"></i>
+            <span>Cam kết bảo mật: Thông tin tài khoản của bạn hoàn toàn không được lưu lại trên hệ thống.</span>
+          </p>
+          <button type="submit" id="btnLogin" class="btn-lux-magnetic text-white font-extrabold text-sm px-8 py-3.5 rounded-2xl flex items-center justify-center gap-2.5">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            <span>Đăng nhập tài khoản</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- FORM B: Direct Token Input -->
+      <form id="tokenForm" class="hidden mt-6 space-y-5">
+        <div class="space-y-1.5">
+          <label class="block text-xs font-extrabold text-gray-800 uppercase tracking-wider flex items-center justify-between">
+            <span>ID Token (Bearer JWT Token)</span>
+            <span class="text-[11px] text-cinematic-hotpink font-bold">Trích xuất từ F12 Network hoặc app Locket</span>
+          </label>
+          <textarea id="inputDirectToken" rows="2" placeholder="eyJhbGciOiJSUzI1NiIsImtpZCI6..." class="cinematic-input w-full rounded-2xl p-4 text-xs font-mono resize-none"></textarea>
+        </div>
+        <div class="flex justify-end">
+          <button type="submit" id="btnSaveToken" class="btn-lux-magnetic text-white font-extrabold text-xs px-7 py-3 rounded-2xl flex items-center gap-2">
+            <i class="fa-solid fa-check"></i>
+            <span>Xác thực & Trích xuất Hồ sơ</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- REAL USER PROFILE BENTO (Displayed when Authenticated) -->
+      <div id="userInfoBox" class="hidden mt-4 space-y-4">
+        <div class="bg-gradient-to-r from-pink-50/95 via-white to-rose-50/80 rounded-3xl p-6 border border-pink-200 shadow-sm relative overflow-hidden">
+          
+          <!-- Profile Main Bar -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 pb-5 border-b border-pink-200/70">
+            <div class="flex items-center gap-4">
+              <div class="relative">
+                <img id="userAvatarImg" src="" alt="Avatar" class="w-18 h-18 sm:w-20 sm:h-20 rounded-3xl object-cover border-2 border-white shadow-[0_0_25px_rgba(255,46,136,0.35)] hidden">
+                <div id="userAvatarFallback" class="w-18 h-18 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-cinematic-hotpink via-cinematic-rose to-cinematic-champagne text-white flex items-center justify-center font-display font-extrabold text-3xl shadow-[0_0_25px_rgba(255,46,136,0.35)]">
+                  <span id="userInitialText">L</span>
+                </div>
+                <span class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full shadow" title="Đã kết nối trực tuyến"></span>
+              </div>
+
+              <div class="space-y-1">
+                <div class="flex items-center gap-2.5">
+                  <h4 id="userDisplayName" class="font-display font-bold text-2xl text-cinematic-plum">Người dùng Locket</h4>
+                  <span class="inline-flex items-center gap-1 text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-extrabold border border-emerald-300">
+                    <i class="fa-solid fa-circle-check text-emerald-600"></i> Chính chủ
+                  </span>
+                </div>
+                <p id="userEmailText" class="text-xs font-bold text-gray-700 flex items-center gap-2">
+                  <i class="fa-solid fa-envelope text-cinematic-rose"></i>
+                  <span id="userEmailValue">user@example.com</span>
+                </p>
+              </div>
+            </div>
+
+            <button id="btnLogout" class="px-5 py-2.5 text-xs bg-white hover:bg-rose-50 text-rose-700 font-extrabold rounded-2xl border border-rose-200 shadow-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2 self-start sm:self-center">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>Đăng xuất</span>
+            </button>
+          </div>
+
+          <!-- Real Account Metadata Grid (8 Rich Account Fields) -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-5 text-xs">
+            <!-- 1. UID -->
+            <div class="bg-white/90 backdrop-blur rounded-2xl p-3.5 border border-pink-100 shadow-xs">
+              <span class="text-[10px] text-gray-600 uppercase font-extrabold tracking-wider block mb-1">Locket User ID</span>
+              <div class="flex items-center justify-between">
+                <span id="userUidShort" class="font-mono font-bold text-cinematic-hotpink truncate max-w-[120px]" title="">...</span>
+                <button id="btnCopyUid" class="text-gray-500 hover:text-cinematic-hotpink transition p-1" title="Sao chép UID">
+                  <i class="fa-regular fa-copy"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Email Verified Status -->
+            <div class="bg-white/90 backdrop-blur rounded-2xl p-3.5 border border-pink-100 shadow-xs">
+              <span class="text-[10px] text-gray-600 uppercase font-extrabold tracking-wider block mb-1">Xác thực Email</span>
+              <span id="userEmailVerifiedBadge" class="font-extrabold text-emerald-700 flex items-center gap-1">
+                <i class="fa-solid fa-shield-check text-emerald-600"></i>
+                <span>Đã xác minh</span>
+              </span>
+            </div>
+
+            <!-- 3. Provider -->
+            <div class="bg-white/90 backdrop-blur rounded-2xl p-3.5 border border-pink-100 shadow-xs">
+              <span class="text-[10px] text-gray-600 uppercase font-extrabold tracking-wider block mb-1">Phương thức</span>
+              <span id="userProviderText" class="font-extrabold text-gray-900 block truncate">Email & Mật khẩu</span>
+            </div>
+
+            <!-- 4. Account Status -->
+            <div class="bg-white/90 backdrop-blur rounded-2xl p-3.5 border border-pink-100 shadow-xs">
+              <span class="text-[10px] text-gray-600 uppercase font-extrabold tracking-wider block mb-1">Trạng thái tài khoản</span>
+              <span id="userAccountStatusText" class="font-extrabold text-emerald-700 flex items-center gap-1 truncate">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                <span>Chính chủ • Live</span>
+              </span>
+            </div>
+
+            <!-- 5. Ngày tham gia -->
+            <div class="bg-white/90 backdrop-blur rounded-2xl p-3.5 border border-pink-100 shadow-xs">
+              <span class="text-[10px] text-gray-600 uppercase font-extrabold tracking-wider block mb-1">Ngày tạo tài khoản</span>
+              <span id="userCreatedAtText" class="font-extrabold text-gray-900 block truncate">Đang đồng bộ...</span>
+            </div>
+
+            <!-- 6. Đăng nhập cuối -->
+            <div class="bg-white/90 backdrop-blur rounded-2xl p-3.5 border border-pink-100 shadow-xs">
+              <span class="text-[10px] text-gray-600 uppercase font-extrabold tracking-wider block mb-1">Lần đăng nhập cuối</span>
+              <span id="userLastLoginText" class="font-extrabold text-gray-900 block truncate">Vừa xong</span>
+            </div>
+
+            <!-- 7. Đổi mật khẩu lần cuối -->
+            <div class="bg-white/90 backdrop-blur rounded-2xl p-3.5 border border-pink-100 shadow-xs">
+              <span class="text-[10px] text-gray-600 uppercase font-extrabold tracking-wider block mb-1">Đổi mật khẩu cuối</span>
+              <span id="userPasswordUpdatedText" class="font-extrabold text-gray-900 block truncate">Chưa đổi</span>
+            </div>
+
+            <!-- 8. Quyền API -->
+            <div class="bg-white/90 backdrop-blur rounded-2xl p-3.5 border border-pink-100 shadow-xs">
+              <span class="text-[10px] text-gray-600 uppercase font-extrabold tracking-wider block mb-1">Quyền API</span>
+              <span class="font-extrabold text-emerald-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-sparkles text-emerald-600"></i>
+                <span>postMomentV2 Hợp lệ</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- ======================================================== -->
+          <!-- USER DASHBOARD TABS: MOMENTS, REACTIONS, FRIENDS, EDIT   -->
+          <!-- ======================================================== -->
+          <div class="mt-6 pt-5 border-t border-pink-200/70">
+            
+            <!-- Tab Navigation Header -->
+            <div class="flex items-center justify-between flex-wrap gap-3 pb-4">
+              <div class="flex items-center gap-1.5 bg-white/90 p-1.5 rounded-2xl border border-pink-200 shadow-xs flex-wrap">
+                <button type="button" id="btnTabMoments" class="user-dash-tab active px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all duration-300 flex items-center gap-1.5 bg-gradient-to-r from-cinematic-hotpink to-cinematic-magenta text-white shadow-sm" data-target="paneMoments">
+                  <i class="fa-solid fa-images"></i>
+                  <span>Kho ảnh đã đăng</span>
+                  <span id="badgeMomentsCount" class="ml-1 px-2 py-0.5 rounded-full text-[10px] bg-white/20 text-white font-mono">0</span>
+                </button>
+                <button type="button" id="btnTabReactions" class="user-dash-tab px-3.5 py-2 rounded-xl text-xs font-extrabold text-gray-700 hover:text-cinematic-hotpink transition-all duration-300 flex items-center gap-1.5" data-target="paneReactions">
+                  <i class="fa-solid fa-heart-pulse text-cinematic-rose"></i>
+                  <span>Thống kê Cảm xúc</span>
+                  <span id="badgeReactionsTotal" class="ml-1 px-2 py-0.5 rounded-full text-[10px] bg-pink-100 text-cinematic-hotpink font-mono">0</span>
+                </button>
+                <button type="button" id="btnTabFriends" class="user-dash-tab px-3.5 py-2 rounded-xl text-xs font-extrabold text-gray-700 hover:text-cinematic-hotpink transition-all duration-300 flex items-center gap-1.5" data-target="paneFriends">
+                  <i class="fa-solid fa-user-group text-sky-500"></i>
+                  <span>Dữ liệu Bạn bè</span>
+                  <span id="badgeFriendsCount" class="ml-1 px-2 py-0.5 rounded-full text-[10px] bg-sky-100 text-sky-700 font-mono">0</span>
+                </button>
+                <button type="button" id="btnTabProfileEdit" class="user-dash-tab px-3.5 py-2 rounded-xl text-xs font-extrabold text-gray-700 hover:text-cinematic-hotpink transition-all duration-300 flex items-center gap-1.5" data-target="paneProfileEdit">
+                  <i class="fa-solid fa-user-pen text-amber-500"></i>
+                  <span>Đổi tên Locket</span>
+                </button>
+              </div>
+
+              <!-- Quick Refresh Sync Button -->
+              <button type="button" id="btnRefreshUserData" class="px-3.5 py-2 rounded-xl bg-white hover:bg-pink-50 text-cinematic-hotpink border border-pink-200 text-xs font-extrabold shadow-xs transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
+                <span>Đồng bộ ngay</span>
+              </button>
+            </div>
+
+            <!-- TAB PANE 1: MOMENTS GALLERY (Kho ảnh đã đăng) -->
+            <div id="paneMoments" class="space-y-4">
+              <div id="momentsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5">
+                <!-- Dynamically populated -->
+              </div>
+              <div id="momentsEmptyState" class="hidden text-center py-10 bg-white/70 rounded-3xl border border-pink-100 p-6 space-y-2">
+                <div class="w-12 h-12 mx-auto rounded-2xl bg-pink-100 text-cinematic-hotpink flex items-center justify-center text-xl">
+                  <i class="fa-regular fa-image"></i>
+                </div>
+                <p class="font-extrabold text-gray-800 text-sm">Chưa có ảnh nào trong khoảnh khắc</p>
+                <p class="text-xs text-gray-600">Đăng khoảnh khắc đầu tiên của bạn ở form bên dưới để tạo kỷ niệm!</p>
+              </div>
+            </div>
+
+            <!-- TAB PANE 2: REACTIONS STATS (Thống kê Cảm xúc) -->
+            <div id="paneReactions" class="hidden space-y-5">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                <!-- Tim -->
+                <div class="bg-white/95 rounded-2xl p-4 border border-pink-200 shadow-xs flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-2xl text-rose-500 shadow-inner">
+                    ❤️
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-gray-600 font-extrabold uppercase tracking-wider block">Thả Tim</span>
+                    <span id="statReactionHeart" class="font-display font-extrabold text-xl text-gray-900">0</span>
+                  </div>
+                </div>
+                <!-- Lửa -->
+                <div class="bg-white/95 rounded-2xl p-4 border border-pink-200 shadow-xs flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-2xl text-amber-500 shadow-inner">
+                    🔥
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-gray-600 font-extrabold uppercase tracking-wider block">Bùng Cháy</span>
+                    <span id="statReactionFlame" class="font-display font-extrabold text-xl text-gray-900">0</span>
+                  </div>
+                </div>
+                <!-- Yêu thích -->
+                <div class="bg-white/95 rounded-2xl p-4 border border-pink-200 shadow-xs flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-2xl bg-pink-50 border border-pink-100 flex items-center justify-center text-2xl text-cinematic-hotpink shadow-inner">
+                    😍
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-gray-600 font-extrabold uppercase tracking-wider block">Yêu Thích</span>
+                    <span id="statReactionLove" class="font-display font-extrabold text-xl text-gray-900">0</span>
+                  </div>
+                </div>
+                <!-- Tổng cộng -->
+                <div class="bg-gradient-to-br from-pink-100 via-rose-50 to-white rounded-2xl p-4 border border-pink-300 shadow-xs flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-2xl bg-white border border-pink-200 flex items-center justify-center text-2xl text-cinematic-hotpink shadow-sm">
+                    ✨
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-cinematic-hotpink font-extrabold uppercase tracking-wider block">Tổng Cảm Xúc</span>
+                    <span id="statReactionTotal" class="font-display font-extrabold text-2xl text-cinematic-plum">0</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Reactions Visualizer Bar -->
+              <div class="bg-white/95 rounded-3xl p-5 border border-pink-200 shadow-xs space-y-3">
+                <div class="flex items-center justify-between text-xs font-extrabold text-gray-800">
+                  <span>Tỷ lệ phân bổ tương tác</span>
+                  <span class="text-cinematic-hotpink text-[11px]">Tự động đồng bộ từ Locket Moments</span>
+                </div>
+                <div class="w-full bg-pink-100 h-3 rounded-full overflow-hidden flex p-0.5">
+                  <div id="barHeart" class="bg-rose-500 h-full rounded-l-full transition-all duration-500" style="width: 50%" title="Thả tim"></div>
+                  <div id="barFlame" class="bg-amber-500 h-full transition-all duration-500" style="width: 25%" title="Bùng cháy"></div>
+                  <div id="barLove" class="bg-pink-500 h-full transition-all duration-500" style="width: 20%" title="Yêu thích"></div>
+                  <div id="barSmile" class="bg-purple-500 h-full rounded-r-full transition-all duration-500" style="width: 5%" title="Khác"></div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] font-bold text-gray-600 flex-wrap gap-2 pt-1">
+                  <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Tim: <b id="pctHeart" class="text-gray-900">50%</b></span>
+                  <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Lửa: <b id="pctFlame" class="text-gray-900">25%</b></span>
+                  <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span> Yêu: <b id="pctLove" class="text-gray-900">20%</b></span>
+                  <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Khác: <b id="pctSmile" class="text-gray-900">5%</b></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB PANE 3: FRIENDS HUB (Dữ liệu bạn bè) -->
+            <div id="paneFriends" class="hidden space-y-4">
+              <div class="flex items-center justify-between flex-wrap gap-3">
+                <div class="relative flex-1 max-w-md">
+                  <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
+                  <input type="text" id="inputSearchFriend" placeholder="Tìm bạn bè theo tên hoặc username..." class="w-full bg-white/95 border border-pink-200 rounded-xl pl-9 pr-4 py-2 text-xs font-semibold focus:outline-none focus:border-cinematic-hotpink transition">
+                </div>
+                <div class="flex items-center gap-2 text-xs font-extrabold text-cinematic-plum bg-pink-100/70 px-3.5 py-1.5 rounded-xl border border-pink-200">
+                  <i class="fa-solid fa-fire text-amber-500"></i>
+                  <span>Chuỗi Streak: <b id="streakDisplay" class="font-mono text-cinematic-hotpink">1 ngày</b></span>
+                </div>
+              </div>
+
+              <!-- Friends Grid -->
+              <div id="friendsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                <!-- Dynamically populated -->
+              </div>
+
+              <!-- Friends Empty State -->
+              <div id="friendsEmptyState" class="hidden text-center py-8 bg-white/70 rounded-3xl border border-pink-100 p-6 space-y-2">
+                <p class="font-extrabold text-gray-800 text-sm">Chưa có danh sách bạn bè kết nối</p>
+                <p class="text-xs text-gray-600">Dữ liệu sẽ tự động xuất hiện khi có bạn bè chia sẻ khoảnh khắc với bạn!</p>
+              </div>
+            </div>
+
+            <!-- TAB PANE 4: EDIT PROFILE (Đổi tên Locket từ tandev282/Locket) -->
+            <div id="paneProfileEdit" class="hidden space-y-4">
+              <div class="bg-white/95 rounded-3xl p-6 border border-pink-200 shadow-xs max-w-xl space-y-4">
+                <div class="space-y-1">
+                  <h5 class="font-display font-bold text-base text-cinematic-plum flex items-center gap-2">
+                    <i class="fa-solid fa-user-pen text-cinematic-hotpink"></i>
+                    <span>Cập nhật Tên hiển thị Locket</span>
+                  </h5>
+                  <p class="text-xs text-gray-600 font-medium">Thay đổi Họ và Tên Locket chính thức qua API `changeProfileInfo`.</p>
+                </div>
+
+                <form id="formChangeName" class="space-y-3.5">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-[11px] font-extrabold text-gray-700 uppercase tracking-wider mb-1">Họ (Last Name)</label>
+                      <input type="text" id="inputLastName" placeholder="Ví dụ: Nguyễn" class="w-full bg-pink-50/50 border border-pink-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold focus:outline-none focus:border-cinematic-hotpink focus:bg-white transition">
+                    </div>
+                    <div>
+                      <label class="block text-[11px] font-extrabold text-gray-700 uppercase tracking-wider mb-1">Tên (First Name)</label>
+                      <input type="text" id="inputFirstName" required placeholder="Ví dụ: Anh" class="w-full bg-pink-50/50 border border-pink-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold focus:outline-none focus:border-cinematic-hotpink focus:bg-white transition">
+                    </div>
+                  </div>
+
+                  <div id="changeNameMsg" class="hidden text-xs font-bold py-2 px-3 rounded-xl"></div>
+
+                  <div class="flex justify-end pt-1">
+                    <button type="submit" id="btnSubmitChangeName" class="btn-lux-magnetic text-white font-extrabold text-xs px-6 py-2.5 rounded-xl flex items-center gap-2">
+                      <i class="fa-solid fa-floppy-disk"></i>
+                      <span>Lưu Tên Mới Lên Locket</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- SECTION 2: CINEMATIC STUDIO & 3D WIDGET SIMULATOR        -->
+    <!-- ======================================================== -->
+    <section class="reveal-stagger-3 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+      <!-- LEFT: UPLOAD CONTROLS (7 Cols) -->
+      <div class="lg:col-span-7 cinematic-glass-card tilt-card rounded-[2.5rem] p-6 sm:p-8 space-y-6 relative overflow-hidden">
+        <div class="specular-sheen"></div>
+
+        <!-- Mode Switcher -->
+        <div class="flex items-center justify-between border-b border-pink-100/80 pb-3">
+          <div class="flex items-center gap-2 bg-pink-100/70 p-1.5 rounded-2xl border border-pink-200/80 text-xs font-extrabold">
+            <button type="button" id="tabPhoto" class="px-5 py-2.5 rounded-xl bg-white text-cinematic-hotpink shadow-sm transition-all duration-300 flex items-center gap-2">
+              <i class="fa-solid fa-camera-retro"></i>
+              <span>Đăng Ảnh</span>
+            </button>
+            <button type="button" id="tabVideo" class="px-5 py-2.5 rounded-xl text-gray-700 hover:text-cinematic-hotpink transition-all duration-300 flex items-center gap-2">
+              <i class="fa-solid fa-film"></i>
+              <span>Đăng Video Short</span>
+            </button>
+          </div>
+          <span class="text-xs text-cinematic-hotpink font-extrabold flex items-center gap-1.5">
+            <i class="fa-solid fa-feather-pointed"></i> Caption thỏa thích
+          </span>
+        </div>
+
+          <form id="uploadForm" class="space-y-6">
+            <!-- Drop Zone -->
+            <div id="dropZone" class="border-2 border-dashed border-pink-300 hover:border-cinematic-hotpink rounded-3xl p-8 text-center bg-pink-50/50 hover:bg-pink-100/50 transition-all duration-300 cursor-pointer group relative overflow-hidden">
+              <input type="file" id="fileInput" accept="image/*" class="hidden">
+              
+              <div id="dropPrompt" class="space-y-3 py-4">
+                <div class="w-20 h-20 rounded-3xl bg-white text-cinematic-hotpink mx-auto flex items-center justify-center text-3xl shadow-[0_0_30px_rgba(255,46,136,0.3)] group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                  <i id="mediaIcon" class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div>
+                  <p class="text-base font-extrabold text-cinematic-plum">
+                    Kéo & thả tệp vào đây hoặc <span class="text-cinematic-hotpink underline decoration-2 underline-offset-4">Chọn tệp</span>
+                  </p>
+                  <p id="mediaFormatHint" class="text-xs font-bold text-gray-700 mt-1">Hỗ trợ các định dạng ảnh JPG, PNG, WEBP</p>
+                </div>
+              </div>
+
+              <!-- Live Preview Container -->
+              <div id="previewContainer" class="hidden relative max-w-xs mx-auto">
+                <div class="relative rounded-2xl overflow-hidden shadow-lg border border-pink-200 aspect-square flex items-center justify-center bg-black">
+                  <img id="imagePreview" src="" class="hidden w-full h-full object-cover">
+                  <video id="videoPreview" src="" controls class="hidden w-full h-full object-cover"></video>
+                </div>
+                <button type="button" id="btnRemoveFile" class="absolute -top-3 -right-3 w-8 h-8 bg-rose-500 hover:bg-rose-600 text-white rounded-full flex items-center justify-center text-xs shadow-md transition-transform hover:scale-110" title="Bỏ chọn">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Caption Textarea (REQUIREMENT 4: NO BLUE BACKGROUND) -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-extrabold text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-pen-nib text-cinematic-hotpink"></i>
+                  <span>Caption Khoảnh Khắc</span>
+                </label>
+                <span id="charCount" class="text-xs font-mono font-extrabold text-cinematic-hotpink bg-pink-100 px-2.5 py-0.5 rounded-full border border-pink-200">0 ký tự</span>
+              </div>
+              <textarea id="inputCaption" rows="3" placeholder="Nhập chú thích của bạn để gửi thẳng lên widget Locket..." class="cinematic-input w-full rounded-2xl p-4 text-sm font-medium resize-none"></textarea>
+
+              <!-- Quick Emojis Bar -->
+              <div class="flex items-center gap-1.5 flex-wrap pt-1">
+                <span class="text-[11px] font-extrabold text-gray-600 mr-1">Chèn nhanh:</span>
+                <button type="button" class="emoji-btn px-2.5 py-1 bg-white hover:bg-pink-100 text-xs rounded-xl border border-pink-200 shadow-xs transition-transform hover:scale-110">❤️</button>
+                <button type="button" class="emoji-btn px-2.5 py-1 bg-white hover:bg-pink-100 text-xs rounded-xl border border-pink-200 shadow-xs transition-transform hover:scale-110">💕</button>
+                <button type="button" class="emoji-btn px-2.5 py-1 bg-white hover:bg-pink-100 text-xs rounded-xl border border-pink-200 shadow-xs transition-transform hover:scale-110">🥰</button>
+                <button type="button" class="emoji-btn px-2.5 py-1 bg-white hover:bg-pink-100 text-xs rounded-xl border border-pink-200 shadow-xs transition-transform hover:scale-110">✨</button>
+                <button type="button" class="emoji-btn px-2.5 py-1 bg-white hover:bg-pink-100 text-xs rounded-xl border border-pink-200 shadow-xs transition-transform hover:scale-110">📸</button>
+                <button type="button" class="emoji-btn px-2.5 py-1 bg-white hover:bg-pink-100 text-xs rounded-xl border border-pink-200 shadow-xs transition-transform hover:scale-110">🌸</button>
+                <button type="button" class="emoji-btn px-2.5 py-1 bg-white hover:bg-pink-100 text-xs rounded-xl border border-pink-200 shadow-xs transition-transform hover:scale-110">🥂</button>
+                <button type="button" class="emoji-btn px-2.5 py-1 bg-white hover:bg-pink-100 text-xs rounded-xl border border-pink-200 shadow-xs transition-transform hover:scale-110">🌙</button>
+              </div>
+
+              <!-- ======================================================== -->
+              <!-- CAPTION NGUYÊN BẢN IN-APP PRESETS (FROM SCREENSHOT)       -->
+              <!-- ======================================================== -->
+              <div class="space-y-2.5 pt-3 border-t border-pink-200/60">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-extrabold text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-wand-magic-sparkles text-cinematic-hotpink"></i>
+                    <span>Caption nguyên bản</span>
+                  </span>
+                  <span class="text-[11px] font-bold text-gray-500">Chuẩn in-app Locket Widget</span>
+                </div>
+
+                <!-- Dark In-App Badge Tray -->
+                <div class="in-app-captions-board bg-[#18181B] p-4 rounded-3xl border border-white/10 shadow-inner space-y-2.5 select-none max-h-[300px] overflow-y-auto custom-scrollbar">
+                  
+                  <!-- Row 1: System / Control -->
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <button type="button" class="locket-cap-pill active-locket-cap" data-text="" data-style="default">
+                      <span>Aa Mặc định</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" data-text="" data-style="custom">
+                      <span>Aa Caption tuỳ chỉnh</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" data-text="🎨" data-style="color">
+                      <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-gradient-to-r from-pink-500 via-yellow-400 to-cyan-400"></span> Màu sắc</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#4F46E5; color:#fff;" data-text="👍 Bình chọn" data-style="poll">
+                      <span>👍 Bình chọn</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" data-text="Review: " data-style="review">
+                      <span>🔲 Review</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" data-text="🎵 Đang phát: " data-style="playing">
+                      <span>🎵 Đang phát</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" data-text="📍 Vị trí" data-style="location">
+                      <span>📍 Vị trí</span>
+                    </button>
+                  </div>
+
+                  <!-- Row 2: Weather, Time, Streak & Zodiac -->
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <button type="button" class="locket-cap-pill" style="background:#0284C7; color:#fff;" data-text="weather_auto" data-style="weather">
+                      <span>🌤️ Thời tiết</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#334155; color:#fff;" data-text="time_auto" data-style="time">
+                      <span>🕒 Thời gian</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#D97706; color:#fff;" data-text="🔥 1" data-style="streak">
+                      <span>🔥 1</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#EAB308; color:#000;" data-text="Mùa Song Tử" data-style="zodiac-gemini">
+                      <span>Mùa Song Tử</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#22C55E; color:#fff;" data-text="Mùa Kim Ngưu" data-style="zodiac-taurus">
+                      <span>Mùa Kim Ngưu</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#F97316; color:#fff;" data-text="Mùa Bạch Dương" data-style="zodiac-aries">
+                      <span>Mùa Bạch Dương</span>
+                    </button>
+                  </div>
+
+                  <!-- Row 3: Events 2026 & Love -->
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <button type="button" class="locket-cap-pill" style="background:linear-gradient(135deg, #FFB6D5, #FF69B4); color:#fff;" data-text="🌸 Mừng ngày Phụ nữ" data-style="women-day-pink">
+                      <span>🌸 Mừng ngày Phụ nữ</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:linear-gradient(135deg, #6366F1, #8B5CF6); color:#fff;" data-text="🎆 Xin chào 2026!" data-style="newyear-2026">
+                      <span>🎆 Xin chào 2026!</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#881337; color:#fff;" data-text="🐴 Xin chào Bính Ngọ!" data-style="binh-ngo">
+                      <span>🐴 Xin chào Bính Ngọ!</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:linear-gradient(135deg, #E11D48, #FF2E88); color:#fff;" data-text="💌 Tình yêu của mình đây" data-style="love-mine">
+                      <span>💌 Tình yêu của mình đây</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:linear-gradient(135deg, #EA580C, #F43F5E); color:#fff;" data-text="2026" data-style="badge-2026">
+                      <span>2026</span>
+                    </button>
+                  </div>
+
+                  <!-- Row 4: Winter & Teachers -->
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <button type="button" class="locket-cap-pill" style="background:linear-gradient(135deg, #059669, #10B981); color:#fff;" data-text="🎄 Giáng sinh an lành" data-style="xmas-mint">
+                      <span>🎄 Giáng sinh an lành</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:linear-gradient(135deg, #0284C7, #38BDF8); color:#fff;" data-text="❄️ 'Tis the season" data-style="tis-season">
+                      <span>❄️ 'Tis the season</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#115E59; color:#fff;" data-text="📖 Tôn vinh thầy cô" data-style="teachers-day">
+                      <span>📖 Tôn vinh thầy cô</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#C2410C; color:#fff;" data-text="🎃 Halloween" data-style="halloween">
+                      <span>🎃 Halloween</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#A855F7; color:#fff;" data-text="🌷 Ngày Phụ nữ" data-style="women-day-purple">
+                      <span>🌷 Ngày Phụ nữ</span>
+                    </button>
+                  </div>
+
+                  <!-- Row 5: Holidays & Korean Slangs -->
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <button type="button" class="locket-cap-pill" style="background:#78350F; color:#fff;" data-text="🥮 Vui Tết Trung Thu" data-style="mid-autumn">
+                      <span>🥮 Vui Tết Trung Thu</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#DC2626; color:#fff;" data-text="⭐ Quốc khánh 2/9" data-style="national-day">
+                      <span>⭐ Quốc khánh 2/9</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#FFFFFF; color:#1E3A8A; border:1px solid #93C5FD;" data-text="🇺🇸 Happy July 4th!" data-style="july-4th">
+                      <span>🇺🇸 Happy July 4th!</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#EC4899; color:#fff;" data-text="쌈뽕 ✨" data-style="korean-ssambong">
+                      <span>쌈뽕 ✨</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#60A5FA; color:#fff;" data-text="보고 싶어 🥺" data-style="korean-miss">
+                      <span>보고 싶어 🥺</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#FDE047; color:#000;" data-text="존맛 😋" data-style="korean-yummy">
+                      <span>존맛 😋</span>
+                    </button>
+                  </div>
+
+                  <!-- Row 6: Family & Earth -->
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <button type="button" class="locket-cap-pill" style="background:#1E3A8A; color:#fff;" data-text="🥇 Father's Day" data-style="fathers-day">
+                      <span>🥇 Father's Day</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#E2E8F0; color:#1E293B;" data-text="🎖️ Memorial Day" data-style="memorial-day">
+                      <span>🎖️ Memorial Day</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#F472B6; color:#fff;" data-text="💐 Mother's Day" data-style="mothers-day">
+                      <span>💐 Mother's Day</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#991B1B; color:#fff;" data-text="⭐ Chào mừng 30/4" data-style="liberation-day">
+                      <span>⭐ Chào mừng 30/4</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:linear-gradient(135deg, #059669, #0284C7); color:#fff;" data-text="🌍 Earth Day" data-style="earth-day">
+                      <span>🌍 Earth Day</span>
+                    </button>
+                  </div>
+
+                  <!-- Row 7: Easter, Valentine & Tet -->
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <button type="button" class="locket-cap-pill" style="background:#FEF08A; color:#854D0E;" data-text="🐣 Happy Easter!" data-style="easter">
+                      <span>🐣 Happy Easter!</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#FBCFE8; color:#9D174D;" data-text="💌 Happy Valentine's Day!" data-style="valentine">
+                      <span>💌 Happy Valentine's Day!</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#991B1B; color:#fff;" data-text="🧧 Tết Nguyên Đán" data-style="tet-nguyen-dan">
+                      <span>🧧 Tết Nguyên Đán</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:linear-gradient(135deg, #7C3AED, #4F46E5); color:#fff;" data-text="🎆 Happy New Year!" data-style="happy-new-year">
+                      <span>🎆 Happy New Year!</span>
+                    </button>
+                  </div>
+
+                  <!-- Row 8: Daily & Mood -->
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <button type="button" class="locket-cap-pill" style="background:#B91C1C; color:#fff;" data-text="🎄 Merry Christmas!" data-style="merry-xmas">
+                      <span>🎄 Merry Christmas!</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#F59E0B; color:#fff;" data-text="☀️ Good Morning" data-style="good-morning">
+                      <span>☀️ Good Morning</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:linear-gradient(180deg, #575CD4, #370C6F); color:#fff;" data-text="🌙 Good Night" data-style="good-night">
+                      <span>🌙 Good Night</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#84CC16; color:#000;" data-text="🪩 Party Time!" data-style="party-time">
+                      <span>🪩 Party Time!</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:#FFFFFF; color:#000; border:1px solid #D1D5DB;" data-text="👀 OOTD" data-style="ootd">
+                      <span>👀 OOTD</span>
+                    </button>
+                    <button type="button" class="locket-cap-pill" style="background:linear-gradient(180deg, #FF493F, #EC0C00); color:#fff;" data-text="🥰 Miss you" data-style="miss-you">
+                      <span>🥰 Miss you</span>
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Multi-stage Progress Bar -->
+            <div id="progressWrapper" class="hidden space-y-2 bg-pink-50/90 border border-pink-200 rounded-2xl p-4">
+              <div class="flex items-center justify-between text-xs font-extrabold text-cinematic-hotpink">
+                <span id="progressText" class="flex items-center gap-2">
+                  <i class="fa-solid fa-circle-notch fa-spin"></i> Đang chuẩn bị tệp...
+                </span>
+                <span id="progressPercent" class="font-mono bg-white px-2.5 py-0.5 rounded-full border border-pink-200">0%</span>
+              </div>
+              <div class="w-full bg-white h-2.5 rounded-full overflow-hidden border border-pink-200 p-0.5">
+                <div id="progressBar" class="bg-gradient-to-r from-cinematic-rose to-cinematic-hotpink h-full rounded-full w-0 transition-all duration-300"></div>
+              </div>
+            </div>
+
+            <!-- Submit CTA Button (REQUIREMENT 8: MAGNETIC & LIGHT SWEEP) -->
+            <button type="submit" id="btnSubmitUpload" class="w-full btn-lux-magnetic py-4 text-white font-extrabold text-base rounded-2xl flex items-center justify-center gap-3">
+              <i class="fa-solid fa-paper-plane text-lg"></i>
+              <span>Đăng Khoảnh Khắc Lên Locket 💖</span>
+            </button>
+          </form>
+      </div>
+      </div>
+
+      <!-- RIGHT: REALISTIC IPHONE LOCKET WIDGET 3D SIMULATOR (5 Cols) -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="cinematic-glass-card tilt-card rounded-[2.5rem] p-6 relative overflow-hidden flex flex-col items-center">
+          <div class="specular-sheen"></div>
+
+          <!-- Widget Header Label -->
+          <div class="w-full flex items-center justify-between border-b border-pink-100 pb-3 mb-4">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-cinematic-hotpink animate-pulse"></span>
+              <h4 class="font-display font-bold text-sm text-cinematic-plum">iPhone Widget 3D Preview</h4>
+            </div>
+            <span class="text-[10px] font-mono font-extrabold text-gray-600 uppercase">Aspect 1:1</span>
+          </div>
+
+          <!-- Physical 3D Widget Simulation Chassis -->
+          <div class="w-full max-w-[290px] aspect-square rounded-[2.8rem] bg-black p-3 widget-chassis-3d relative overflow-hidden border-[5px] border-white/95">
+            <div id="simulatedWidgetScreen" class="w-full h-full rounded-[2.2rem] overflow-hidden relative bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
+              
+              <img id="simWidgetImg" src="" class="w-full h-full object-cover hidden">
+              <video id="simWidgetVideo" src="" autoplay loop muted playsinline class="w-full h-full object-cover hidden"></video>
+              
+              <div id="simWidgetEmpty" class="text-center p-6 space-y-2">
+                <i class="fa-solid fa-sparkles text-cinematic-babypink text-2xl animate-pulse"></i>
+                <p class="text-xs font-extrabold text-white/90">Widget Locket đang chờ khoảnh khắc của bạn</p>
+              </div>
+
+              <!-- Top Left Author Tag -->
+              <div class="absolute top-3.5 left-3.5 flex items-center gap-2 bg-black/55 backdrop-blur-md px-3 py-1 rounded-full text-[11px] text-white font-semibold border border-white/20">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span id="previewUserLabel">Locket Preview</span>
+              </div>
+
+              <!-- Bottom Synchronized Caption Overlay -->
+              <div id="previewCaptionOverlay" class="absolute bottom-3.5 inset-x-3.5 bg-black/65 backdrop-blur-md text-white text-xs font-semibold px-3 py-2 rounded-2xl text-center border border-white/20 shadow-md truncate hidden">
+                <span id="previewCaptionText"></span>
+              </div>
+
+            </div>
+          </div>
+
+          <p class="text-[11px] font-bold text-gray-700 text-center mt-4">
+            Khoảnh khắc sẽ xuất hiện trên màn hình chính (Home Screen) của bạn bè ngay lập tức.
+          </p>
+        </div>
+
+        <!-- LIVE ACTIVITY LOG CARD -->
+        <div class="cinematic-glass-card tilt-card rounded-3xl p-5 space-y-3 relative overflow-hidden">
+          <div class="specular-sheen"></div>
+          <div class="flex items-center justify-between border-b border-pink-100 pb-2.5">
+            <h5 class="text-xs font-extrabold text-cinematic-plum uppercase tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-terminal text-cinematic-hotpink"></i>
+              <span>Nhật ký API Trực tiếp</span>
+            </h5>
+            <button id="btnClearConsole" class="text-[11px] font-extrabold text-gray-600 hover:text-cinematic-hotpink transition">Xóa</button>
+          </div>
+          <div id="consoleLog" class="bg-cinematic-plumDeep text-pink-200 border border-pink-900/40 rounded-2xl p-3.5 font-mono text-[11px] h-36 overflow-y-auto space-y-1.5 leading-relaxed shadow-inner">
+            <p class="text-gray-400">[System] Sẵn sàng đồng bộ Locket API...</p>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- FOOTER                                                   -->
+  <!-- ======================================================== -->
+  <footer class="py-10 text-center text-xs font-bold text-gray-700 relative z-20 border-t border-pink-200/60 mt-16">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>Locket Love Studio &copy; 2026 • Made with HB</p>
+      <a href="https://www.instagram.com/_soft.w_/" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/90 hover:bg-gradient-to-r hover:from-pink-50 hover:to-rose-50 border border-pink-200 shadow-xs text-gray-700 hover:text-cinematic-hotpink font-extrabold text-xs transition-all duration-300 hover:scale-105 active:scale-95">
+        <i class="fa-brands fa-instagram text-lg text-pink-500 group-hover:scale-110 transition-transform"></i>
+        <span>Kết nối với mình</span>
+      </a>
+    </div>
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- MOMENT FULLVIEW MODAL                                     -->
+  <!-- ======================================================== -->
+  <div id="momentModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="relative bg-zinc-900 border border-white/20 rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl p-4 text-white space-y-3">
+      <div class="flex items-center justify-between">
+        <span id="modalMomentDate" class="text-xs text-gray-400 font-semibold">Khoảnh khắc Locket</span>
+        <button id="btnCloseMomentModal" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="aspect-square rounded-2xl overflow-hidden bg-black flex items-center justify-center relative border border-white/10">
+        <img id="modalMomentImg" src="" class="w-full h-full object-cover">
+        <video id="modalMomentVideo" src="" controls autoplay loop class="w-full h-full object-cover hidden"></video>
+      </div>
+      <p id="modalMomentCaption" class="text-sm font-medium text-white/90 px-1 italic"></p>
+      <div id="modalMomentReactions" class="flex items-center justify-between text-xs font-bold text-pink-400 pt-2 border-t border-white/10">
+        <div id="modalReactionIcons" class="flex items-center gap-2"></div>
+        <a id="modalMomentDownload" href="#" target="_blank" download="locket-moment.jpg" class="text-white/80 hover:text-white flex items-center gap-1">
+          <i class="fa-solid fa-download"></i> <span>Tải về</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Client Script with Cache Buster -->
+  <script src="/app.js?v=3.6"></script>
+</body>
+</html>

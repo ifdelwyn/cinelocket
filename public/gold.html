@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Locket VIP Gold Pass • Trải Nghiệm Độc Lập</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti for Celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Google Fonts: Super Legible Vietnamese Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Be Vietnam Pro"', '"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          colors: {
+            cinematic: {
+              plum: '#1A0410',
+              plumDeep: '#12020B',
+              hotpink: '#FF2E88',
+              rose: '#FF6FA8',
+              magenta: '#D6106B',
+              blush: '#FFF5F9',
+              babypink: '#FFE4EF',
+              champagne: '#FFD9A8'
+            },
+            vip: {
+              void: '#FFF5F9',
+              plumDeep: '#FFF0F5',
+              plumDark: '#FFE4EF',
+              plumCard: 'rgba(255, 255, 255, 0.88)',
+              hotpink: '#FF2E88',
+              neonPink: '#FF0F7B',
+              rose: '#FF6FA8',
+              magenta: '#D6106B',
+              gold: '#E59866',
+              champagne: '#D6106B',
+              glowPink: 'rgba(255, 46, 136, 0.25)',
+              glowGold: 'rgba(255, 111, 168, 0.2)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* ======================================================== */
+    /* 1. CINEMATIC BLUSH PINK ATMOSPHERE                        */
+    /* ======================================================== */
+    body {
+      background-color: #FFF5F9;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(255, 46, 136, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(255, 111, 168, 0.15) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(255, 228, 239, 0.6) 0px, transparent 70%),
+        radial-gradient(at 100% 100%, rgba(255, 241, 246, 0.8) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(255, 46, 136, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: #1A0410;
+      font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Film Noise */
+    .film-grain {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* Ambient canvas for soft falling petals & dust */
+    #ambientCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* ======================================================== */
+    /* 2. TRANSPARENT OUTLINE & GLASS FONT EFFECTS              */
+    /* ======================================================== */
+    /* Transparent font with bold hotpink outline - 100% sharp and readable */
+    .font-transparent-stroke {
+      color: transparent;
+      -webkit-text-stroke: 1.8px #FF2E88;
+      letter-spacing: 0.03em;
+      text-shadow: 0 0 18px rgba(255, 46, 136, 0.28);
+      display: inline-block;
+      font-weight: 900;
+    }
+
+    /* Subtle transparent watermark text for luxury backdrop */
+    .watermark-transparent-text {
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(255, 46, 136, 0.12);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* ======================================================== */
+    /* 3. 3D PERSPECTIVE VIP BOARDING PASS                      */
+    /* ======================================================== */
+    .card-stage {
+      perspective: 1200px;
+    }
+
+    .ticket-card {
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+      will-change: transform;
+    }
+
+    /* Holographic foil specular sheen */
+    .holo-sheen {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        115deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 25%,
+        rgba(255, 46, 136, 0.15) 48%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 46, 136, 0.15) 52%,
+        rgba(255, 255, 255, 0.4) 75%,
+        transparent 100%
+      );
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      border-radius: inherit;
+      opacity: 0.7;
+      transition: opacity 0.3s ease, transform 0.2s ease;
+    }
+
+    /* Perforated ticket edge styling */
+    .ticket-perforated {
+      position: relative;
+    }
+    
+    .notch-top {
+      position: absolute;
+      top: -14px;
+      right: 25%;
+      width: 28px;
+      height: 28px;
+      background: #FFF5F9;
+      border-radius: 50%;
+      box-shadow: inset 0 -3px 5px rgba(255, 46, 136, 0.12), 0 1px 0 rgba(251, 207, 232, 0.8);
+      z-index: 20;
+    }
+
+    .notch-bottom {
+      position: absolute;
+      bottom: -14px;
+      right: 25%;
+      width: 28px;
+      height: 28px;
+      background: #FFF5F9;
+      border-radius: 50%;
+      box-shadow: inset 0 3px 5px rgba(255, 46, 136, 0.12), 0 -1px 0 rgba(251, 207, 232, 0.8);
+      z-index: 20;
+    }
+
+    @media (max-width: 768px) {
+      .notch-top, .notch-bottom {
+        display: none;
+      }
+    }
+
+    /* Glass card styles */
+    .vip-glass {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid rgba(251, 207, 232, 0.9);
+      box-shadow: 0 20px 45px -10px rgba(255, 46, 136, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.95);
+    }
+
+    .vip-glass-active {
+      border: 2px solid #FF2E88 !important;
+      box-shadow: 0 25px 60px -10px rgba(255, 46, 136, 0.35), 0 0 45px rgba(255, 111, 168, 0.25) !important;
+    }
+
+    /* Glowing animated borders */
+    .glow-box-pink {
+      box-shadow: 0 15px 40px -5px rgba(255, 46, 136, 0.14), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+    }
+
+    /* Spotlight Input Glow */
+    .spotlight-input {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1.5px solid #FBCFE8;
+      box-shadow: 0 4px 15px rgba(255, 46, 136, 0.06);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .spotlight-input:focus-within {
+      border-color: #FF2E88;
+      box-shadow: 0 0 0 4px rgba(255, 46, 136, 0.18), 0 8px 25px rgba(255, 46, 136, 0.15);
+    }
+
+    /* Magnetic luxury button */
+    .btn-lux-magnetic {
+      background: linear-gradient(135deg, #FF2E88 0%, #FF6FA8 50%, #D6106B 100%);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 32px -6px rgba(255, 46, 136, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+    }
+    .btn-lux-magnetic:hover {
+      box-shadow: 0 16px 40px -6px rgba(255, 46, 136, 0.6), 0 0 25px rgba(255, 111, 168, 0.3);
+      transform: translateY(-1px);
+    }
+
+    /* Custom Drawer Transition */
+    .drawer-overlay {
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .drawer-panel {
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FFE4EF;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #FF6FA8;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #FF2E88;
+    }
+  </style>
+</head>
+<body class="selection:bg-cinematic-hotpink selection:text-white">
+
+  <!-- Grain overlay -->
+  <div class="film-grain"></div>
+  <canvas id="ambientCanvas"></canvas>
+
+  <!-- ======================================================== -->
+  <!-- NAVBAR: COMPLETELY STANDALONE (NO CROSS-PAGE LINKS)      -->
+  <!-- ======================================================== -->
+  <header class="sticky top-0 z-40 px-4 sm:px-8 py-3.5 transition-all duration-300">
+    <div class="max-w-5xl mx-auto vip-glass rounded-2xl px-5 sm:px-7 py-3 flex items-center justify-between shadow-sm">
+      
+      <!-- Brand & VIP Emblem -->
+      <div class="flex items-center gap-3.5 select-none">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cinematic-hotpink via-cinematic-magenta to-cinematic-rose flex items-center justify-center text-white text-lg shadow-md shadow-pink-500/30">
+          <i class="fa-solid fa-crown text-sm text-white"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-xl tracking-wider text-cinematic-plum">
+              LOCKET <span class="text-cinematic-hotpink">GOLD</span>
+            </h1>
+            <span class="text-[9px] font-mono font-extrabold uppercase px-2 py-0.5 rounded-full bg-pink-100 text-cinematic-hotpink border border-pink-300">
+              VIP Pass
+            </span>
+          </div>
+          <p class="text-[10px] font-semibold text-gray-700 hidden sm:block">Kích hoạt đặc quyền tài khoản Locket cao cấp</p>
+        </div>
+      </div>
+
+      <!-- Standalone Status Badge (No cross-page login or link) -->
+      <div class="flex items-center gap-2 bg-pink-100/90 px-3.5 py-1.5 rounded-2xl border border-pink-300/80 text-xs font-extrabold text-cinematic-hotpink shadow-xs">
+        <span class="w-2 h-2 rounded-full bg-cinematic-hotpink animate-ping"></span>
+        <span>Công cụ Độc lập • Không cần Đăng nhập</span>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- MAIN WORKSPACE                                           -->
+  <!-- ======================================================== -->
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8 relative z-20">
+
+    <!-- HERO TITLE: MODERN SANS + TRANSPARENT OUTLINE ACCENT -->
+    <section class="text-center space-y-3">
+      <div class="inline-flex items-center gap-2 text-[11px] font-mono font-extrabold tracking-wider uppercase text-cinematic-hotpink bg-white/95 px-4 py-1.5 rounded-full border border-pink-200 shadow-xs">
+        <i class="fa-solid fa-sparkles text-amber-500"></i>
+        <span>VIP First-Class Boarding Pass</span>
+      </div>
+      
+      <h2 class="font-black text-3xl sm:text-5xl text-cinematic-plum tracking-tight leading-tight">
+        Kích Hoạt <span class="font-transparent-stroke">LOCKET GOLD</span>
+      </h2>
+      
+      <p class="text-sm sm:text-base text-gray-700 font-medium max-w-lg mx-auto leading-relaxed">
+        Nhập username, link chia sẻ hoặc UID Locket để kích hoạt gói đặc quyền Gold ngay lập tức.
+      </p>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- 3D VIP BOARDING PASS TICKET CARD                         -->
+    <!-- ======================================================== -->
+    <section class="card-stage flex justify-center pt-2 pb-4">
+      <div id="ticketPass" class="ticket-card ticket-perforated vip-glass w-full max-w-3xl rounded-3xl p-6 sm:p-8 border border-pink-200 glow-box-pink relative overflow-hidden shadow-xl">
+        
+        <!-- Large Transparent Watermark in Background -->
+        <div class="watermark-transparent-text absolute -right-4 -bottom-4 text-7xl sm:text-8xl font-black select-none pointer-events-none tracking-tighter">
+          GOLD PASS
+        </div>
+
+        <!-- Specular Sheen layer -->
+        <div id="cardSheen" class="holo-sheen"></div>
+        
+        <!-- Perforated Notch cuts (Desktop) -->
+        <div class="notch-top"></div>
+        <div class="notch-bottom"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
+          
+          <!-- LEFT 3 COLS: PASSENGER & FLIGHT DETAILS -->
+          <div class="md:col-span-3 space-y-6 md:pr-6 md:border-r md:border-dashed md:border-pink-300">
+            
+            <!-- Ticket Header -->
+            <div class="flex items-center justify-between border-b border-pink-200 pb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cinematic-hotpink to-cinematic-magenta flex items-center justify-center text-white text-sm shadow-md shadow-pink-500/25">
+                  <i class="fa-solid fa-plane-departure text-white"></i>
+                </div>
+                <div>
+                  <h4 class="font-black text-xs tracking-widest text-cinematic-plum uppercase">LOCKET AIRWAYS • VIP CLASS</h4>
+                  <span class="text-[10px] font-mono font-extrabold text-cinematic-magenta">BOARDING PASS • DIRECT ENTITLEMENT</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span id="ticketBadgeStatus" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-extrabold bg-pink-100 text-cinematic-hotpink border border-pink-300">
+                  <span class="w-2 h-2 rounded-full bg-cinematic-hotpink animate-ping"></span>
+                  <span id="ticketBadgeText">PENDING</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Passenger Avatar & Name -->
+            <div class="flex items-center gap-4 sm:gap-5">
+              <div class="relative">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-pink-300 shadow-md bg-pink-50 flex items-center justify-center">
+                  <img id="cardAvatarImg" src="https://firebasestorage.googleapis.com/v0/b/locket-public-assets/o/invites%2Fen.png?alt=media" alt="Avatar" class="w-full h-full object-cover hidden">
+                  <div id="cardAvatarFallback" class="text-cinematic-hotpink text-2xl font-bold">
+                    <i class="fa-solid fa-user-astronaut"></i>
+                  </div>
+                </div>
+                <div id="crownPill" class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gradient-to-tr from-amber-400 to-amber-500 flex items-center justify-center text-[10px] text-white shadow-md border-2 border-white">
+                  <i class="fa-solid fa-crown text-[10px]"></i>
+                </div>
+              </div>
+
+              <div class="space-y-1">
+                <span class="text-[10px] font-mono uppercase text-gray-500 font-extrabold tracking-wider block">TÀI KHOẢN KÍCH HOẠT</span>
+                <h3 id="cardUsernameDisplay" class="font-black text-2xl sm:text-3xl text-cinematic-plum tracking-tight truncate max-w-[260px] sm:max-w-md">
+                  @username
+                </h3>
+                <div class="flex items-center gap-2">
+                  <span id="cardUidDisplay" class="text-[11px] font-mono text-cinematic-hotpink bg-pink-100/70 px-2.5 py-0.5 rounded-lg border border-pink-200 font-bold">
+                    UID: Chưa phân giải
+                  </span>
+                  <button id="btnCopyCardUid" type="button" class="text-xs text-cinematic-hotpink hover:text-cinematic-magenta transition hidden cursor-pointer" title="Sao chép UID">
+                    <i class="fa-regular fa-copy"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bento Details Row -->
+            <div class="grid grid-cols-3 gap-3 pt-2 border-t border-pink-200 text-xs">
+              <div class="bg-pink-50/80 p-2.5 rounded-xl border border-pink-200">
+                <span class="text-[10px] font-mono text-gray-600 font-bold uppercase block">HẠNG VÉ</span>
+                <span class="font-extrabold text-cinematic-hotpink mt-0.5 block">GOLD FIRST</span>
+              </div>
+              <div class="bg-pink-50/80 p-2.5 rounded-xl border border-pink-200">
+                <span class="text-[10px] font-mono text-gray-600 font-bold uppercase block">NGÀY CẤP</span>
+                <span id="cardIssueDate" class="font-mono font-extrabold text-cinematic-plum mt-0.5 block">2026</span>
+              </div>
+              <div class="bg-pink-50/80 p-2.5 rounded-xl border border-pink-200">
+                <span class="text-[10px] font-mono text-gray-600 font-bold uppercase block">LÁ CHẮN DNS</span>
+                <span id="cardDnsStatus" class="font-extrabold text-emerald-700 mt-0.5 block">AUTO GUARD</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT 1 COL: TICKET STUB / BARCODE -->
+          <div class="flex flex-col justify-between items-center text-center space-y-4 pt-4 md:pt-0 border-t md:border-t-0 border-dashed border-pink-300">
+            <div class="space-y-1">
+              <span class="text-[10px] font-mono text-gray-600 font-bold uppercase block">GATE</span>
+              <span class="font-black text-2xl text-cinematic-hotpink font-transparent-stroke">VIP-1</span>
+            </div>
+
+            <!-- Stylized Barcode SVG -->
+            <div class="py-2 opacity-80 hover:opacity-100 transition-opacity">
+              <svg class="w-36 md:w-28 h-12 text-cinematic-plum mx-auto" viewBox="0 0 100 40" fill="currentColor">
+                <rect x="2" width="2" height="40" />
+                <rect x="6" width="3" height="40" />
+                <rect x="11" width="1" height="40" />
+                <rect x="14" width="4" height="40" />
+                <rect x="20" width="2" height="40" />
+                <rect x="24" width="1" height="40" />
+                <rect x="27" width="3" height="40" />
+                <rect x="32" width="2" height="40" />
+                <rect x="36" width="4" height="40" />
+                <rect x="42" width="1" height="40" />
+                <rect x="45" width="3" height="40" />
+                <rect x="50" width="2" height="40" />
+                <rect x="54" width="4" height="40" />
+                <rect x="60" width="1" height="40" />
+                <rect x="63" width="2" height="40" />
+                <rect x="67" width="4" height="40" />
+                <rect x="73" width="2" height="40" />
+                <rect x="77" width="1" height="40" />
+                <rect x="80" width="3" height="40" />
+                <rect x="85" width="2" height="40" />
+                <rect x="89" width="4" height="40" />
+                <rect x="95" width="2" height="40" />
+              </svg>
+              <span class="text-[9px] font-mono text-gray-500 font-bold block mt-1">LKT-GLD-PASS-2026</span>
+            </div>
+
+            <div class="w-full">
+              <span class="text-[9px] font-mono text-gray-500 font-bold block">VERIFIED PASS</span>
+              <div class="flex items-center justify-center gap-1 text-[11px] text-emerald-700 font-extrabold mt-0.5">
+                <i class="fa-solid fa-shield-check text-xs text-emerald-600"></i>
+                <span>AUTHENTIC</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- SPOTLIGHT COMMAND BAR INPUT & ACTIONS                    -->
+    <!-- ======================================================== -->
+    <section class="max-w-2xl mx-auto space-y-4">
+      
+      <form id="goldActivationForm" class="space-y-4">
+        
+        <!-- Spotlight Search Bar -->
+        <div class="spotlight-input rounded-2xl p-2 sm:p-2.5 flex items-center gap-3">
+          
+          <!-- Input Icon -->
+          <div class="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center text-cinematic-hotpink text-base shrink-0 border border-pink-200">
+            <i class="fa-solid fa-at"></i>
+          </div>
+
+          <!-- Text Input -->
+          <input 
+            type="text" 
+            id="inputUsername" 
+            placeholder="Nhập username, link locket.cam hoặc UID..." 
+            autocomplete="off"
+            spellcheck="false"
+            class="w-full bg-transparent text-sm sm:text-base text-cinematic-plum placeholder:text-gray-400 font-medium focus:outline-none"
+          />
+
+          <!-- Clear Input Button -->
+          <button 
+            type="button" 
+            id="btnClearInput" 
+            class="text-gray-400 hover:text-cinematic-hotpink p-2 transition hidden cursor-pointer"
+            title="Xóa nội dung"
+          >
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+
+          <!-- Advanced Settings Button -->
+          <button 
+            type="button" 
+            id="btnOpenSettings" 
+            class="w-10 h-10 rounded-xl bg-pink-50 hover:bg-pink-100 text-gray-700 hover:text-cinematic-hotpink flex items-center justify-center text-sm border border-pink-200 transition shrink-0 cursor-pointer"
+            title="Tùy chọn nâng cao"
+          >
+            <i class="fa-solid fa-sliders"></i>
+          </button>
+
+        </div>
+
+        <!-- Magnetic Submit Button -->
+        <button 
+          type="submit" 
+          id="btnSubmitActivate" 
+          class="btn-lux-magnetic w-full py-4 rounded-2xl text-white font-extrabold text-base tracking-wide flex items-center justify-center gap-3 cursor-pointer"
+        >
+          <i class="fa-solid fa-crown text-amber-300"></i>
+          <span id="btnSubmitText">Kích Hoạt Locket Gold Ngay</span>
+        </button>
+
+      </form>
+
+      <!-- Gentle Guidance / Direct UID Helper -->
+      <div class="text-center">
+        <p class="text-[12px] text-gray-600 font-medium leading-relaxed">
+          Hỗ trợ cả username thông thường, link chia sẻ kết bạn Locket, hoặc mã UID 28 ký tự trực tiếp.
+        </p>
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- REAL-TIME TIMELINE & STEPPER PANEL                       -->
+    <!-- ======================================================== -->
+    <section id="stepperSection" class="max-w-2xl mx-auto vip-glass rounded-3xl p-5 sm:p-6 border border-pink-200 shadow-xl space-y-4 hidden animate-fadeIn">
+      
+      <div class="flex items-center justify-between border-b border-pink-200 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-2.5 h-2.5 rounded-full bg-cinematic-hotpink animate-ping"></div>
+          <h4 class="font-black text-xs tracking-wider text-cinematic-plum uppercase">
+            Tiến Trình Kích Hoạt Quyền Lợi
+          </h4>
+        </div>
+        <span id="stepperOverallStatus" class="text-[11px] font-mono text-cinematic-hotpink font-extrabold">Đang chuẩn bị...</span>
+      </div>
+
+      <!-- Stepper Steps Container -->
+      <div class="space-y-3 pt-1 text-xs">
+        
+        <!-- Step 1: Phân giải UID -->
+        <div id="step1" class="flex items-center justify-between p-3.5 rounded-2xl bg-pink-50/70 border border-pink-100 transition">
+          <div class="flex items-center gap-3">
+            <div id="step1Icon" class="w-6 h-6 rounded-lg bg-pink-100 text-pink-400 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-circle-dot"></i>
+            </div>
+            <div>
+              <span class="font-extrabold text-cinematic-plum block">1. Phân giải tài khoản Locket</span>
+              <span id="step1Sub" class="text-[11px] text-gray-600 font-mono font-medium">Đang chờ lệnh...</span>
+            </div>
+          </div>
+          <span id="step1Badge" class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-white text-gray-500 border border-pink-100 font-bold">Chờ</span>
+        </div>
+
+        <!-- Step 2: Tra cứu RevenueCat -->
+        <div id="step2" class="flex items-center justify-between p-3.5 rounded-2xl bg-pink-50/70 border border-pink-100 transition">
+          <div class="flex items-center gap-3">
+            <div id="step2Icon" class="w-6 h-6 rounded-lg bg-pink-100 text-pink-400 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-circle-dot"></i>
+            </div>
+            <div>
+              <span class="font-extrabold text-cinematic-plum block">2. Tra cứu quyền lợi gói dịch vụ</span>
+              <span id="step2Sub" class="text-[11px] text-gray-600 font-mono font-medium">Đang chờ lệnh...</span>
+            </div>
+          </div>
+          <span id="step2Badge" class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-white text-gray-500 border border-pink-100 font-bold">Chờ</span>
+        </div>
+
+        <!-- Step 3: Cấp quyền Gold -->
+        <div id="step3" class="flex items-center justify-between p-3.5 rounded-2xl bg-pink-50/70 border border-pink-100 transition">
+          <div class="flex items-center gap-3">
+            <div id="step3Icon" class="w-6 h-6 rounded-lg bg-pink-100 text-pink-400 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-circle-dot"></i>
+            </div>
+            <div>
+              <span class="font-extrabold text-cinematic-plum block">3. Xác thực & Cấp quyền Locket Gold</span>
+              <span id="step3Sub" class="text-[11px] text-gray-600 font-mono font-medium">Đang chờ lệnh...</span>
+            </div>
+          </div>
+          <span id="step3Badge" class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-white text-gray-500 border border-pink-100 font-bold">Chờ</span>
+        </div>
+
+        <!-- Step 4: Cấu hình DNS -->
+        <div id="step4" class="flex items-center justify-between p-3.5 rounded-2xl bg-pink-50/70 border border-pink-100 transition">
+          <div class="flex items-center gap-3">
+            <div id="step4Icon" class="w-6 h-6 rounded-lg bg-pink-100 text-pink-400 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-circle-dot"></i>
+            </div>
+            <div>
+              <span class="font-extrabold text-cinematic-plum block">4. Khởi tạo lá chắn bảo vệ chống thu hồi</span>
+              <span id="step4Sub" class="text-[11px] text-gray-600 font-mono font-medium">Đang chờ lệnh...</span>
+            </div>
+          </div>
+          <span id="step4Badge" class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-white text-gray-500 border border-pink-100 font-bold">Chờ</span>
+        </div>
+
+      </div>
+
+      <!-- Realtime Log Accordion -->
+      <div class="pt-2 border-t border-pink-200">
+        <button 
+          type="button" 
+          id="btnToggleLogTerminal" 
+          class="w-full flex items-center justify-between text-[11px] font-mono text-gray-700 hover:text-cinematic-hotpink font-bold transition py-1 cursor-pointer"
+        >
+          <span class="flex items-center gap-2">
+            <i class="fa-solid fa-terminal text-xs text-cinematic-hotpink"></i>
+            <span>Xem chi tiết nhật ký thực thi</span>
+          </span>
+          <i id="terminalArrow" class="fa-solid fa-chevron-down transition-transform duration-200"></i>
+        </button>
+        <div id="terminalLogBox" class="bg-cinematic-plumDeep text-pink-200 border border-pink-900/40 rounded-2xl p-3.5 font-mono text-[11px] h-36 overflow-y-auto space-y-1.5 mt-2 leading-relaxed shadow-inner hidden">
+          <p class="text-gray-400">[System] Sẵn sàng kích hoạt...</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- RESULT & ANTI-REVOKE DOWNLOAD CARD                       -->
+    <!-- ======================================================== -->
+    <section id="resultSection" class="max-w-2xl mx-auto space-y-4 hidden animate-fadeIn">
+      
+      <div class="vip-glass rounded-3xl p-6 sm:p-8 border border-pink-300 shadow-xl space-y-6">
+        
+        <!-- Header Banner -->
+        <div class="flex items-center gap-4 border-b border-pink-200 pb-5">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cinematic-hotpink via-cinematic-magenta to-amber-400 flex items-center justify-center text-white text-2xl shadow-lg shadow-pink-500/30 shrink-0">
+            <i class="fa-solid fa-crown text-white"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-mono text-cinematic-hotpink uppercase font-extrabold tracking-wider block">KÍCH HOẠT THÀNH CÔNG</span>
+            <h3 class="font-black text-xl sm:text-2xl text-cinematic-plum">Chào mừng đến với Locket VIP</h3>
+            <p class="text-xs text-gray-700 font-medium mt-0.5">Tài khoản của bạn đã được cấp quyền sở hữu tính năng Gold.</p>
+          </div>
+        </div>
+
+        <!-- DNS Protection Bento Box -->
+        <div class="bg-pink-50/80 rounded-2xl p-5 border border-pink-200 space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-pink-100 text-cinematic-hotpink flex items-center justify-center text-sm border border-pink-300">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <h5 class="font-extrabold text-xs text-cinematic-plum uppercase tracking-wider">Cấu Hình Bảo Vệ Quyền Lợi (DNS Shield)</h5>
+            </div>
+            <span id="resultProfileBadge" class="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-300 font-extrabold">Profile: Ready</span>
+          </div>
+
+          <p class="text-xs text-gray-700 leading-relaxed font-semibold">
+            Vào ứng dụng Locket trên điện thoại để xác nhận biểu tượng Gold. Sau đó, cài đặt cấu hình DNS bên dưới để duy trì quyền lợi lâu dài:
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <!-- iOS -->
+            <div class="bg-white p-3.5 rounded-2xl border border-pink-200 flex flex-col justify-between gap-3 shadow-xs">
+              <div class="flex items-center gap-2 text-xs font-extrabold text-cinematic-plum">
+                <i class="fa-brands fa-apple text-sm text-gray-800"></i>
+                <span>Dành cho iOS (Safari)</span>
+              </div>
+              <a 
+                id="btnIosDns" 
+                href="#" 
+                target="_blank" 
+                class="btn-lux-magnetic w-full py-2.5 px-3 text-white text-xs font-extrabold rounded-xl text-center shadow-md flex items-center justify-center gap-1.5"
+              >
+                <i class="fa-solid fa-download"></i>
+                <span>Tải Profile DNS (Safari)</span>
+              </a>
+            </div>
+
+            <!-- Android -->
+            <div class="bg-white p-3.5 rounded-2xl border border-pink-200 flex flex-col justify-between gap-3 shadow-xs">
+              <div class="flex items-center gap-2 text-xs font-extrabold text-cinematic-plum">
+                <i class="fa-brands fa-android text-sm text-emerald-600"></i>
+                <span>Dành cho Android (Private DNS)</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <input 
+                  type="text" 
+                  id="inputAndroidDns" 
+                  readonly 
+                  value="dns.nextdns.io" 
+                  class="w-full bg-pink-50 border border-pink-200 rounded-xl px-2.5 py-1.5 text-[11px] font-mono text-cinematic-plum font-bold focus:outline-none"
+                >
+                <button 
+                  type="button" 
+                  id="btnCopyAndroidDns" 
+                  class="px-3 py-1.5 bg-white hover:bg-pink-100 text-cinematic-hotpink font-extrabold rounded-xl text-xs transition border border-pink-200 cursor-pointer shadow-xs"
+                >
+                  Chép
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Standalone Guidance Note -->
+        <div class="pt-3 border-t border-pink-200 text-center">
+          <p class="text-xs text-gray-600 font-medium">
+            Mở ứng dụng <strong class="text-cinematic-hotpink font-bold">Locket</strong> trên điện thoại để trải nghiệm các huy hiệu Gold, gửi ảnh sắc nét và các tính năng VIP.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- ADVANCED SETTINGS DRAWER (Slide-over from right)         -->
+  <!-- ======================================================== -->
+  <div id="settingsDrawerOverlay" class="drawer-overlay fixed inset-0 bg-black/40 backdrop-blur-xs z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+  <aside id="settingsDrawerPanel" class="drawer-panel fixed top-0 right-0 bottom-0 w-full sm:w-[420px] bg-white/98 backdrop-blur-2xl border-l border-pink-200 z-50 p-6 space-y-6 overflow-y-auto translate-x-full shadow-2xl">
+    
+    <!-- Drawer Header -->
+    <div class="flex items-center justify-between border-b border-pink-200 pb-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-pink-100 text-cinematic-hotpink flex items-center justify-center text-sm border border-pink-200">
+          <i class="fa-solid fa-sliders"></i>
+        </div>
+        <div>
+          <h3 class="font-black text-sm text-cinematic-plum">Cài Đặt Nâng Cao</h3>
+          <span class="text-[10px] font-mono text-gray-600 font-bold">Tùy biến tham số nạp quyền lợi</span>
+        </div>
+      </div>
+      <button id="btnCloseSettings" class="text-gray-500 hover:text-cinematic-hotpink p-2 rounded-xl transition cursor-pointer">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Drawer Form -->
+    <div class="space-y-5 text-xs">
+      
+      <!-- Receipt Fetch Token -->
+      <div class="space-y-1.5">
+        <label class="font-extrabold text-cinematic-plum uppercase font-mono text-[11px] block">Receipt Fetch Token (Tùy chọn)</label>
+        <textarea 
+          id="inputFetchToken" 
+          rows="3" 
+          placeholder="Mã fetch token từ thiết bị..."
+          class="w-full bg-pink-50/60 border border-pink-200 rounded-xl p-3 text-cinematic-plum font-mono text-[11px] focus:outline-none focus:border-cinematic-hotpink"
+        ></textarea>
+        <span class="text-[10px] text-gray-500 font-medium block">Để trống nếu bạn muốn hệ thống tự động tạo mã tương thích.</span>
+      </div>
+
+      <!-- App Transaction -->
+      <div class="space-y-1.5">
+        <label class="font-extrabold text-cinematic-plum uppercase font-mono text-[11px] block">App Transaction JWS (Tùy chọn)</label>
+        <textarea 
+          id="inputAppTransaction" 
+          rows="3" 
+          placeholder="Chuỗi App Transaction StoreKit 2..."
+          class="w-full bg-pink-50/60 border border-pink-200 rounded-xl p-3 text-cinematic-plum font-mono text-[11px] focus:outline-none focus:border-cinematic-hotpink"
+        ></textarea>
+      </div>
+
+      <!-- NextDNS API Key -->
+      <div class="space-y-1.5">
+        <label class="font-extrabold text-cinematic-plum uppercase font-mono text-[11px] block">NextDNS API Key (Tùy chọn)</label>
+        <input 
+          type="password" 
+          id="inputNextDnsKey" 
+          placeholder="Khóa API tài khoản NextDNS cá nhân..."
+          class="w-full bg-pink-50/60 border border-pink-200 rounded-xl px-3 py-2.5 text-cinematic-plum font-mono text-[11px] focus:outline-none focus:border-cinematic-hotpink"
+        />
+        <span class="text-[10px] text-gray-500 font-medium block">Dùng để tạo hồ sơ DNS cá nhân riêng biệt tự động chặn máy chủ thu hồi.</span>
+      </div>
+
+      <!-- Sandbox Mode Toggle -->
+      <div class="flex items-center justify-between p-3.5 rounded-xl bg-pink-50/60 border border-pink-200">
+        <div>
+          <span class="font-extrabold text-cinematic-plum block">Môi trường Thử nghiệm (Sandbox)</span>
+          <span class="text-[10px] text-gray-600 font-medium">Gửi cờ sandbox lên StoreKit</span>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="checkSandbox" class="sr-only peer">
+          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cinematic-hotpink"></div>
+        </label>
+      </div>
+
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="pt-4 border-t border-pink-200">
+      <button 
+        type="button" 
+        id="btnSaveSettings" 
+        class="btn-lux-magnetic w-full py-3 rounded-xl text-white font-extrabold text-xs uppercase tracking-wider shadow-md cursor-pointer"
+      >
+        Áp Dụng Cài Đặt
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ======================================================== -->
+  <!-- FOOTER: STANDALONE                                       -->
+  <!-- ======================================================== -->
+  <footer class="py-10 text-center text-xs font-bold text-gray-600 relative z-20 border-t border-pink-200 mt-16">
+    <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>Locket Gold Standalone VIP Edition &copy; 2026 • Made with HB</p>
+      <a href="https://www.instagram.com/_soft.w_/" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/90 hover:bg-gradient-to-r hover:from-pink-50 hover:to-rose-50 border border-pink-200 shadow-xs text-gray-700 hover:text-cinematic-hotpink font-extrabold text-xs transition-all duration-300 hover:scale-105 active:scale-95">
+        <i class="fa-brands fa-instagram text-lg text-pink-500 group-hover:scale-110 transition-transform"></i>
+        <span>Kết nối với mình</span>
+      </a>
+    </div>
+  </footer>
+
+  <!-- App Script with Cache Buster -->
+  <script src="/gold.js?v=3.3"></script>
+</body>
+</html>
