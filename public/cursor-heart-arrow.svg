@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+  <defs>
+    <filter id="cursorShadow" x="-25%" y="-25%" width="170%" height="170%">
+      <feDropShadow dx="0.8" dy="1.5" stdDeviation="1.2" flood-color="#1A0410" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="heartGrad" x1="20%" y1="10%" x2="90%" y2="100%">
+      <stop offset="0%" stop-color="#FF5C9D"/>
+      <stop offset="45%" stop-color="#FF2E88"/>
+      <stop offset="100%" stop-color="#D6106B"/>
+    </linearGradient>
+    <linearGradient id="goldArrow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF4D0"/>
+      <stop offset="40%" stop-color="#FFC83B"/>
+      <stop offset="100%" stop-color="#E68A00"/>
+    </linearGradient>
+    <linearGradient id="featherGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB6D5"/>
+      <stop offset="100%" stop-color="#FF2E88"/>
+    </linearGradient>
+  </defs>
+
+  <g filter="url(#cursorShadow)">
+    <!-- Shaft and Tail Feathers -->
+    <line x1="2" y1="2" x2="33" y2="33" stroke="#2B0515" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M26 31 L33 33 L31 26 L28 27 L25 29 Z" fill="url(#featherGrad)" stroke="#2B0515" stroke-width="0.8" stroke-linejoin="round"/>
+    <path d="M28 34 L34 34 L34 28" stroke="#FFFFFF" stroke-width="0.9" stroke-linecap="round"/>
+    <line x1="2" y1="2" x2="33" y2="33" stroke="url(#goldArrow)" stroke-width="1.8" stroke-linecap="round"/>
+
+    <!-- Pierced Heart with 3D Depth -->
+    <path d="M18.5 28 C13.2 23.5 8 18.8 8 13.2 C8 9.5 10.8 6.8 14.2 6.8 C16.5 6.8 17.8 7.9 18.5 9.2 C19.2 7.9 20.5 6.8 22.8 6.8 C26.2 6.8 29 9.5 29 13.2 C29 18.8 23.8 23.5 18.5 28 Z" 
+          fill="url(#heartGrad)" 
+          stroke="#FFFFFF" 
+          stroke-width="1.5" 
+          stroke-linejoin="round"/>
+
+    <ellipse cx="14" cy="13.5" rx="1.6" ry="1.2" transform="rotate(-45 14 13.5)" fill="#5A0826" opacity="0.65"/>
+    <ellipse cx="23" cy="22.5" rx="1.6" ry="1.2" transform="rotate(-45 23 22.5)" fill="#5A0826" opacity="0.65"/>
+
+    <!-- Piercing Shaft -->
+    <line x1="12" y1="12" x2="16.5" y2="16.5" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+    <line x1="12" y1="12" x2="16.5" y2="16.5" stroke="url(#goldArrow)" stroke-width="1.6" stroke-linecap="round"/>
+
+    <!-- Heart Glossy Highlight -->
+    <path d="M10.8 12.2 C10.5 10 11.8 8.4 13.8 8.2" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" opacity="0.85"/>
+    <circle cx="12" cy="14" r="0.7" fill="#FFFFFF" opacity="0.75"/>
+
+    <!-- Arrowhead Tip (2,2) -->
+    <polygon points="2,2 11,4.2 7.5,7.5 4.2,11" fill="#2B0515"/>
+    <polygon points="2.5,2.5 10,4.5 7.2,7.2 4.5,10" fill="url(#goldArrow)" stroke="#FFFFFF" stroke-width="0.75" stroke-linejoin="round"/>
+    <circle cx="3.2" cy="3.2" r="0.8" fill="#FFFFFF"/>
+  </g>
+</svg>

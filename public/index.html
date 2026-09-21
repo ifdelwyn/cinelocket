@@ -49,6 +49,21 @@
   
   <style>
     /* ======================================================== */
+    /* 0. CUSTOM CUPID HEART ARROW CURSOR (MŨI TÊN XUYÊN TRÁI TIM) */
+    /* ======================================================== */
+    *, *::before, *::after {
+      cursor: url('/cursor-heart-arrow.svg') 2 2, auto;
+    }
+
+    a, button, [role="button"], input[type="submit"], input[type="button"], input[type="file"], select, label, .cursor-pointer {
+      cursor: url('/cursor-heart-arrow-pointer.svg') 2 2, pointer !important;
+    }
+
+    input[type="text"], input[type="email"], input[type="password"], textarea {
+      cursor: text;
+    }
+
+    /* ======================================================== */
     /* 1. CINEMATIC GRADIENT MESH & ATMOSPHERE                  */
     /* ======================================================== */
     body {

@@ -1,4 +1,5 @@
 const axios = require('axios');
+const crypto = require('crypto');
 
 const REVENUECAT_BASE_URL = 'https://api.revenuecat.com/v1';
 const REVENUECAT_BEARER = 'Bearer appl_JngFETzdodyLmCREOlwTUtXdQik';
@@ -176,64 +177,220 @@ async function checkRevenueCatStatus(uid) {
 }
 
 /**
+ * TOKEN_SETS — Mỗi bộ chứa fetch_token + app_transaction thật
+ * Lấy từ env hoặc fallback sang config mặc định
+ * Theo đúng cấu trúc thanhdo1110/Locket-Gold config.py
+ */
+const TOKEN_SETS = (() => {
+  // Env-based: LOCKET_TOKEN_SETS='[{"fetch_token":"...","app_transaction":"...","is_sandbox":true}]'
+  if (process.env.LOCKET_TOKEN_SETS) {
+    try { return JSON.parse(process.env.LOCKET_TOKEN_SETS); } catch {}
+  }
+
+  // Individual env pairs: LOCKET_FETCH_TOKEN_1, LOCKET_APP_TX_1, ...
+  const sets = [];
+  for (let i = 1; i <= 5; i++) {
+    const ft = process.env[`LOCKET_FETCH_TOKEN_${i}`];
+    const at = process.env[`LOCKET_APP_TX_${i}`];
+    if (ft) {
+      sets.push({
+        fetch_token: ft,
+        app_transaction: at || '',
+        hash_params: process.env[`LOCKET_HASH_PARAMS_${i}`] || '',
+        hash_headers: process.env[`LOCKET_HASH_HEADERS_${i}`] || '',
+        is_sandbox: process.env[`LOCKET_IS_SANDBOX_${i}`] === 'true',
+        name: `Token-${i}`
+      });
+    }
+  }
+  if (sets.length > 0) return sets;
+
+  // Fallback: bộ mặc định (cần user cung cấp qua web UI hoặc env)
+  return [
+    {
+      fetch_token: '',
+      app_transaction: '',
+      hash_params: '',
+      hash_headers: '',
+      is_sandbox: true,
+      name: 'Default-Sandbox'
+    },
+    {
+      fetch_token: '',
+      app_transaction: '',
+      hash_params: '',
+      hash_headers: '',
+      is_sandbox: false,
+      name: 'Default-Production'
+    }
+  ];
+})();
+
+// Round-robin counter cho TOKEN_SETS
+let tokenSetIndex = 0;
+
+/**
  * Thực thi gửi Receipt Payload lên RevenueCat API
+ * Logic 100% theo thanhdo1110/Locket-Gold: inject_gold()
+ * - Dùng TOKEN_SETS xoay vòng (round-robin)
+ * - Retry 5 lần mỗi token set
+ * - Xử lý 529 (Server Busy) với cooldown
+ * - Verify entitlement sau 200 OK
+ * - Hỗ trợ token từ web UI ghi đè token mặc định
  */
 async function injectGoldReceipt(uid, tokenConfig = {}) {
   const url = `${REVENUECAT_BASE_URL}/receipts`;
 
-  const fetchToken = tokenConfig.fetchToken || tokenConfig.fetch_token || '';
-  const appTransaction = tokenConfig.appTransaction || tokenConfig.app_transaction || '';
-  const isSandbox = Boolean(tokenConfig.isSandbox || tokenConfig.is_sandbox);
+  // Nếu user cung cấp fetch_token qua web UI → dùng nó, không xoay vòng
+  const userProvidedToken = tokenConfig.fetchToken || tokenConfig.fetch_token || '';
+  const userProvidedTx = tokenConfig.appTransaction || tokenConfig.app_transaction || '';
 
-  const payload = {
-    product_id: 'locket_199_1m',
-    fetch_token: fetchToken,
-    app_transaction: appTransaction,
-    app_user_id: uid,
-    is_restore: true,
-    store_country: 'VNM',
-    currency: 'USD',
-    price: '1.99',
-    normal_duration: 'P1M',
-    subscription_group_id: '21419447',
-    observer_mode: false,
-    initiation_source: 'restore',
-    offers: [],
-    attributes: {
-      '$attConsentStatus': {
-        updated_at_ms: Date.now(),
-        value: 'notDetermined'
+  let activeTokenSets;
+  if (userProvidedToken) {
+    // User cung cấp token → tạo 1 token set duy nhất
+    activeTokenSets = [{
+      fetch_token: userProvidedToken,
+      app_transaction: userProvidedTx,
+      hash_params: tokenConfig.hashParams || '',
+      hash_headers: tokenConfig.hashHeaders || '',
+      is_sandbox: Boolean(tokenConfig.isSandbox),
+      name: 'User-Provided'
+    }];
+  } else {
+    // Xoay vòng qua TOKEN_SETS (round-robin như repo gốc)
+    activeTokenSets = [TOKEN_SETS[tokenSetIndex % TOKEN_SETS.length]];
+    tokenSetIndex++;
+  }
+
+  let lastResult = null;
+  let totalAttempts = 0;
+
+  for (const tset of activeTokenSets) {
+    const body = {
+      product_id: 'locket_199_1m',
+      fetch_token: tset.fetch_token,
+      app_transaction: tset.app_transaction,
+      app_user_id: uid,
+      is_restore: true,
+      store_country: 'VNM',
+      currency: 'USD',
+      price: '1.99',
+      normal_duration: 'P1M',
+      subscription_group_id: '21419447',
+      observer_mode: false,
+      initiation_source: 'restore',
+      offers: [],
+      attributes: {
+        '$attConsentStatus': {
+          updated_at_ms: Date.now(),
+          value: 'notDetermined'
+        }
+      }
+    };
+
+    const currentHeaders = { ...REVENUECAT_HEADERS };
+    currentHeaders['Content-Length'] = String(Buffer.byteLength(JSON.stringify(body)));
+    currentHeaders['X-Is-Sandbox'] = String(tset.is_sandbox).toLowerCase();
+
+    if (tset.hash_params) currentHeaders['X-Post-Params-Hash'] = tset.hash_params;
+    if (tset.hash_headers) currentHeaders['X-Headers-Hash'] = tset.hash_headers;
+
+    // Retry 5 lần (theo repo gốc)
+    for (let attempt = 1; attempt <= 5; attempt++) {
+      totalAttempts++;
+      try {
+        const res = await axios.post(url, body, {
+          headers: currentHeaders,
+          timeout: 15000
+        });
+
+        if (res.status === 200) {
+          // 200 OK → Verify entitlement (theo repo gốc)
+          let status = await checkRevenueCatStatus(uid);
+          if (status && status.isGoldActive) {
+            return {
+              success: true,
+              statusCode: 200,
+              tokenSet: tset.name || `Token-${tokenSetIndex}`,
+              attempt: totalAttempts,
+              message: 'Gold Entitlement Active!',
+              expiresDate: status.expiresDate,
+              data: res.data
+            };
+          }
+
+          // Retry verification sau 2 giây (theo repo gốc)
+          await delay(2000);
+          status = await checkRevenueCatStatus(uid);
+          if (status && status.isGoldActive) {
+            return {
+              success: true,
+              statusCode: 200,
+              tokenSet: tset.name || `Token-${tokenSetIndex}`,
+              attempt: totalAttempts,
+              message: 'Gold Active after delay verification.',
+              expiresDate: status.expiresDate,
+              data: res.data
+            };
+          }
+
+          // 200 nhưng không có Gold → receipt hết hạn
+          lastResult = {
+            success: false,
+            statusCode: 200,
+            tokenSet: tset.name,
+            error: 'Accepted but no Gold entitlement (token may be expired)',
+            message: 'Receipt được chấp nhận nhưng chưa kích hoạt Gold. Token có thể đã hết hạn.'
+          };
+          break; // Không retry thêm với token này
+        }
+      } catch (err) {
+        const statusCode = err.response?.status || 500;
+        const rawError = err.response?.data?.message || err.message;
+
+        // 529 = Server Busy → cooldown 2s rồi retry (theo repo gốc)
+        if (statusCode === 529) {
+          await delay(2000);
+          continue;
+        }
+
+        lastResult = {
+          success: false,
+          statusCode,
+          tokenSet: tset.name,
+          error: rawError,
+          errorCode: err.response?.data?.code || null
+        };
+
+        // Các lỗi khác không cần retry (400, 401, 403...)
+        if (statusCode >= 400 && statusCode < 500 && statusCode !== 429) {
+          break;
+        }
+
+        // Network error → retry sau 2s
+        await delay(2000);
       }
     }
+  }
+
+  // Map lỗi sang tiếng Việt
+  const friendlyMessages = {
+    'The receipt is not valid.': 'Token xác thực không hợp lệ hoặc đã hết hạn. Cần cập nhật TOKEN_SETS mới.',
+    'Invalid credentials': 'Thông tin xác thực API RevenueCat không hợp lệ.',
+    'The receipt is already in use by another subscriber.': 'Token này đã được sử dụng cho tài khoản khác.'
   };
 
-  const headers = { ...REVENUECAT_HEADERS };
-  headers['Content-Length'] = String(Buffer.byteLength(JSON.stringify(payload)));
-  headers['X-Is-Sandbox'] = String(isSandbox);
+  const rawErr = lastResult?.error || 'Không xác định';
+  const friendlyErr = friendlyMessages[rawErr] || lastResult?.message || `Hệ thống phản hồi: ${rawErr}`;
 
-  if (tokenConfig.hashParams) headers['X-Post-Params-Hash'] = tokenConfig.hashParams;
-  if (tokenConfig.hashHeaders) headers['X-Headers-Hash'] = tokenConfig.hashHeaders;
-
-  try {
-    const res = await axios.post(url, payload, {
-      headers,
-      timeout: 20000
-    });
-
-    return {
-      success: res.status === 200,
-      statusCode: res.status,
-      data: res.data
-    };
-  } catch (err) {
-    return {
-      success: false,
-      statusCode: err.response?.status || 500,
-      error: err.response?.data?.message || err.message,
-      errorCode: err.response?.data?.code || null,
-      raw: err.response?.data || null
-    };
-  }
+  return {
+    ...lastResult,
+    success: false,
+    message: friendlyErr,
+    totalAttempts,
+    tokenSetsAvailable: TOKEN_SETS.length,
+    hasValidTokens: TOKEN_SETS.some(t => t.fetch_token && t.fetch_token.length > 10)
+  };
 }
 
 /**
@@ -325,8 +482,8 @@ async function runLocketGoldPipeline(inputUsername, options = {}) {
     addLog('Tài khoản hiện tại ở gói Tiêu chuẩn. Đang gửi lệnh khôi phục quyền lợi...', 'warn');
   }
 
-  // Bước 3: Gửi payload kích hoạt
-  addLog('Đang truyền dữ liệu xác thực quyền lợi Gold...');
+  // Bước 3: Gửi payload kích hoạt (TOKEN_SETS round-robin + retry 5x)
+  addLog(`Đang gửi Receipt Payload (${TOKEN_SETS.length} token sets, retry 5x)...`);
   const injectResult = await injectGoldReceipt(userObj.uid, {
     fetchToken: options.fetchToken || '',
     appTransaction: options.appTransaction || '',
@@ -334,9 +491,9 @@ async function runLocketGoldPipeline(inputUsername, options = {}) {
   });
 
   if (injectResult.success) {
-    addLog('Hệ thống xác thực phản hồi 200 OK! Gói Gold đã được ghi nhận.', 'success');
+    addLog(`Gold Entitlement Active! (via ${injectResult.tokenSet}, ${injectResult.attempt} attempts, expires: ${injectResult.expiresDate})`, 'success');
   } else {
-    addLog(`Xác nhận yêu cầu (${injectResult.statusCode}): ${injectResult.error || 'Đang cập nhật phiên bản dịch vụ.'}`, 'warn');
+    addLog(`${injectResult.message || 'Injection failed.'} [${injectResult.totalAttempts} attempts, ${injectResult.tokenSetsAvailable} token sets, valid tokens: ${injectResult.hasValidTokens}]`, 'warn');
   }
 
   // Bước 4: Kiểm tra lại quyền lợi
