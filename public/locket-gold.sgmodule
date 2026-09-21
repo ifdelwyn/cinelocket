@@ -1,0 +1,10 @@
+#!name=Locket Gold VIP 2099
+#!desc=Mở khóa Locket Gold vĩnh viễn đến năm 2099 (Không lo receipt hết hạn)
+#!author=LocketStudio
+#!category=Unlock
+
+[MITM]
+hostname = %APPEND% api.revenuecat.com
+
+[Script]
+LocketGold = type=http-response,pattern=^https:\/\/api\.revenuecat\.com\/v1\/(subscribers\/[^\/]+$|receipts$),requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/ifdelwyn/cinelocket/main/public/locket-gold.js
