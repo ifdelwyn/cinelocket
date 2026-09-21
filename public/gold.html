@@ -677,15 +677,26 @@
                 <i class="fa-brands fa-apple text-sm text-gray-800"></i>
                 <span>Dành cho iOS (Safari)</span>
               </div>
-              <a 
-                id="btnIosDns" 
-                href="#" 
-                target="_blank" 
-                class="btn-lux-magnetic w-full py-2.5 px-3 text-white text-xs font-extrabold rounded-xl text-center shadow-md flex items-center justify-center gap-1.5"
-              >
-                <i class="fa-solid fa-download"></i>
-                <span>Tải Profile DNS (Safari)</span>
-              </a>
+              <div class="flex flex-col gap-2">
+                <a 
+                  id="btnIosDns" 
+                  href="/locket.mobileconfig" 
+                  download="locket.mobileconfig"
+                  class="btn-lux-magnetic w-full py-2.5 px-3 text-white text-xs font-extrabold rounded-xl text-center shadow-md flex items-center justify-center gap-1.5"
+                >
+                  <i class="fa-solid fa-download"></i>
+                  <span>Tải File Cấu Hình (locket.mobileconfig)</span>
+                </a>
+                <a 
+                  id="btnIosDnsAlt" 
+                  href="https://apple.nextdns.io/?profile=ca31cd" 
+                  target="_blank" 
+                  class="w-full py-2 px-3 bg-pink-100 hover:bg-pink-200 text-cinematic-hotpink text-[11px] font-bold rounded-xl text-center flex items-center justify-center gap-1 transition"
+                >
+                  <i class="fa-solid fa-globe"></i>
+                  <span>Hoặc Cài Qua NextDNS (Safari)</span>
+                </a>
+              </div>
             </div>
 
             <!-- Android -->
@@ -713,6 +724,34 @@
             </div>
           </div>
 
+        </div>
+
+        <!-- Hướng dẫn hiện Gold trên điện thoại -->
+        <div class="bg-amber-50/80 rounded-2xl p-5 border border-amber-200 space-y-3">
+          <div class="flex items-center gap-2 text-amber-800 font-extrabold text-xs uppercase tracking-wider">
+            <i class="fa-solid fa-lightbulb text-amber-500 text-sm"></i>
+            <span>3 Bước Để Biểu Tượng Gold Xuất Hiện Trong App Locket:</span>
+          </div>
+          <ol class="space-y-2 text-xs text-gray-700 font-medium">
+            <li class="flex items-start gap-2">
+              <span class="w-5 h-5 rounded-full bg-amber-200 text-amber-900 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
+              <div>
+                <strong>Bấm Khôi Phục Trong App:</strong> Mở app Locket trên điện thoại ➔ Vào <strong>Cài đặt (biểu tượng bánh răng)</strong> ➔ Bấm vào dòng <strong>"Khôi phục giao dịch mua" (Restore Purchases)</strong> để app nhận diện gói Gold vừa được kích hoạt.
+              </div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="w-5 h-5 rounded-full bg-amber-200 text-amber-900 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
+              <div>
+                <strong>Khởi Động Lại App Locket:</strong> Vuốt màn hình đa nhiệm để <strong>tắt hẳn (Kill app)</strong> Locket rồi mở lại.
+              </div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="w-5 h-5 rounded-full bg-amber-200 text-amber-900 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
+              <div>
+                <strong>Cài Cấu Hình Chống Thu Hồi:</strong> Tải file <code>locket.mobileconfig</code> ở trên và cài đặt vào máy để tránh bị Apple quét thu hồi gói.
+              </div>
+            </li>
+          </ol>
         </div>
 
         <!-- Standalone Guidance Note -->
