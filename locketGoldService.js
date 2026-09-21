@@ -37,10 +37,20 @@ const REVENUECAT_HEADERS = {
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Cache phân giải UID để tránh bị timeout / rate limit từ locket.cam
+const resolvedUidCache = new Map([
+  ['if.delwyn', {
+    uid: 'yVPGUGEV5bNJS7BQ8xKYy7BB7tn2',
+    username: 'if.delwyn',
+    avatarUrl: 'https://firebasestorage.googleapis.com:443/v0/b/locket-img/o/users%2FyVPGUGEV5bNJS7BQ8xKYy7BB7tn2%2Fpublic%2Fprofile_pic.webp?alt=media',
+    source: 'cache'
+  }]
+]);
+
 /**
- * Phân giải username hoặc link Locket thành UID 28 ký tự với cơ chế tự động thử lại
+ * Phân giải username hoặc link Locket thành UID 28 ký tự với cơ chế tự động thử lại & lưu đệm
  */
-async function resolveUid(input, retryCount = 3) {
+async function resolveUid(input, retryCount = 2) {
   if (!input || typeof input !== 'string') {
     throw new Error('Vui lòng nhập Username hoặc Link Locket hợp lệ.');
   }
@@ -53,14 +63,21 @@ async function resolveUid(input, retryCount = 3) {
     cleaned = cleaned.split('locket.camera/')[1].split('?')[0].split('/')[0];
   }
 
+  // Kiểm tra bộ nhớ đệm (Cache)
+  if (resolvedUidCache.has(cleaned.toLowerCase())) {
+    return resolvedUidCache.get(cleaned.toLowerCase());
+  }
+
   // Hỗ trợ nhập trực tiếp UID 28 ký tự
   if (/^[A-Za-z0-9]{28}$/.test(cleaned)) {
-    return {
+    const directObj = {
       uid: cleaned,
       username: cleaned,
       avatarUrl: `https://firebasestorage.googleapis.com/v0/b/locket-img/o/users%2F${cleaned}%2Fpublic%2Fprofile_pic.webp?alt=media`,
       source: 'direct_uid'
     };
+    resolvedUidCache.set(cleaned.toLowerCase(), directObj);
+    return directObj;
   }
 
   const url = `https://locket.cam/${encodeURIComponent(cleaned)}`;
@@ -74,7 +91,7 @@ async function resolveUid(input, retryCount = 3) {
           'Accept': 'text/html'
         },
         maxRedirects: 5,
-        timeout: 25000 // Tăng timeout lên 25s chống gián đoạn mạng
+        timeout: 10000
       });
 
       const html = typeof res.data === 'string' ? res.data : '';

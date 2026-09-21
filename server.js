@@ -46,7 +46,6 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-/**
 // Cache for user moments uploaded in the current session
 const userSessionMoments = new Map();
 
@@ -360,9 +359,14 @@ app.post('/api/server2/activate-gold', async (req, res) => {
   }
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`===================================================`);
-  console.log(`🚀 Locket Web App đang chạy tại: http://localhost:${PORT}`);
-  console.log(`===================================================`);
-});
+// Start Server (Only when not in serverless environment)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`===================================================`);
+    console.log(`🚀 Locket Web App đang chạy tại: http://localhost:${PORT}`);
+    console.log(`===================================================`);
+  });
+}
+
+module.exports = app;
+
