@@ -19,35 +19,24 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm ci || npm install
+        run: npm install
 
-      - name: Initialize Capacitor iOS Platform
+      - name: Sync Capacitor iOS Web Assets
         run: |
-          npx cap add ios || true
-          npx cap sync ios
+          npx cap sync ios || npx cap copy ios
 
-      - name: Configure iOS Permissions & 120Hz ProMotion Optimization
+      - name: Build Xcode Release Archive (Unsigned)
         run: |
-          PLIST="ios/App/App/Info.plist"
+          if [ -d "ios/App/App.xcworkspace" ]; then
+            BUILD_TARGET="-workspace ios/App/App.xcworkspace"
+          else
+            BUILD_TARGET="-project ios/App/App.xcodeproj"
+          fi
 
-          # 1. Unlock 120Hz ProMotion High-Refresh Rate on iPhone & iPad Pro
-          /usr/libexec/PlistBuddy -c "Add :CADisableMinimumFrameDurationOnPhone bool true" "$PLIST" || /usr/libexec/PlistBuddy -c "Set :CADisableMinimumFrameDurationOnPhone true" "$PLIST"
-          /usr/libexec/PlistBuddy -c "Add :CADisableMinimumFrameDuration bool true" "$PLIST" || /usr/libexec/PlistBuddy -c "Set :CADisableMinimumFrameDuration true" "$PLIST"
+          echo "Using build target: $BUILD_TARGET"
 
-          # 2. Native Camera & Photo Library Permissions
-          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string 'CineLocket cần quyền truy cập camera để chụp ảnh và quay video đăng lên Locket.'" "$PLIST" || true
-          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string 'CineLocket cần quyền truy cập thư viện để chọn ảnh và video đăng tải lên Locket.'" "$PLIST" || true
-          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryAddUsageDescription string 'CineLocket cần quyền lưu ảnh và video về thiết bị.'" "$PLIST" || true
-
-          # 3. Mobile Display & Fullscreen Optimization
-          /usr/libexec/PlistBuddy -c "Add :UIRequiresFullScreen bool true" "$PLIST" || true
-          /usr/libexec/PlistBuddy -c "Add :UIViewControllerBasedStatusBarAppearance bool false" "$PLIST" || true
-          /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" "$PLIST" || true
-
-      - name: Build Xcode Archive (Unsigned)
-        run: |
           xcodebuild \
-            -workspace ios/App/App.xcworkspace \
+            $BUILD_TARGET \
             -scheme App \
             -configuration Release \
             -destination 'generic/platform=iOS' \
@@ -60,7 +49,7 @@ jobs:
       - name: Package App into .IPA File
         run: |
           mkdir -p build/Payload
-          cp -r build/App.xcarchive/Products/Applications/App.app build/Payload/
+          cp -r build/App.xcarchive/Products/Applications/*.app build/Payload/
           cd build
           zip -qr CineLocket.ipa Payload
 
