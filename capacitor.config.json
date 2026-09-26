@@ -1,0 +1,15 @@
+{
+  "appId": "com.ifdelwyn.cinelocket",
+  "appName": "CineLocket",
+  "webDir": "public",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://cinelocket.vercel.app",
+    "cleartext": true
+  },
+  "ios": {
+    "contentInset": "always",
+    "allowsLinkPreview": false,
+    "scrollEnabled": true
+  }
+}
