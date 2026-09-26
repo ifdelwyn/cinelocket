@@ -1,0 +1,28 @@
+{
+	"appId": "com.ifdelwyn.cinelocket",
+	"appName": "CineLocket",
+	"webDir": "public",
+	"bundledWebRuntime": false,
+	"backgroundColor": "#12020B",
+	"server": {
+		"url": "https://cinelocket.vercel.app",
+		"cleartext": true,
+		"allowNavigation": [
+			"cinelocket.vercel.app",
+			"*.vercel.app",
+			"*.firebaseio.com",
+			"*.googleapis.com",
+			"firebasestorage.googleapis.com",
+			"locket.cam",
+			"*.locket.camera"
+		]
+	},
+	"ios": {
+		"contentInset": "automatic",
+		"preferredContentMode": "mobile",
+		"allowsLinkPreview": false,
+		"scrollEnabled": true,
+		"backgroundColor": "#12020B"
+	},
+	"packageClassList": []
+}

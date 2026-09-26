@@ -12,39 +12,42 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install Dependencies
         run: npm install
 
-      - name: Sync Capacitor iOS Web Assets
+      - name: Sync Web Assets to iOS Native App
         run: |
-          npx cap sync ios || npx cap copy ios
+          echo "Copying web assets directly to native iOS bundle..."
+          mkdir -p ios/App/App/public
+          cp -r public/* ios/App/App/public/
+          cp capacitor.config.json ios/App/App/capacitor.config.json
+          npx cap copy ios || true
+
+      - name: Resolve Swift Package Dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj -clonedSourcePackagesDirPath SourcePackages
 
       - name: Build Xcode Release Archive (Unsigned)
         run: |
-          if [ -d "ios/App/App.xcworkspace" ]; then
-            BUILD_TARGET="-workspace ios/App/App.xcworkspace"
-          else
-            BUILD_TARGET="-project ios/App/App.xcodeproj"
-          fi
-
-          echo "Using build target: $BUILD_TARGET"
-
+          mkdir -p build
           xcodebuild \
-            $BUILD_TARGET \
+            -project ios/App/App.xcodeproj \
             -scheme App \
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath build/App.xcarchive \
+            -clonedSourcePackagesDirPath SourcePackages \
             archive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY=""
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_STYLE=Manual
 
       - name: Package App into .IPA File
         run: |
