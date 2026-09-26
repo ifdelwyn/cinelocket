@@ -3,7 +3,12 @@ name: Build CineLocket iOS IPA (120Hz Mobile Optimized)
 on:
   push:
     branches: [ main, master ]
+    tags:
+      - 'v*'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build-ipa:
@@ -62,3 +67,23 @@ jobs:
           name: CineLocket-iOS-IPA-120Hz
           path: build/CineLocket.ipa
           retention-days: 14
+
+      - name: Publish Public GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0-ios
+          name: "CineLocket iOS (120Hz ProMotion) v1.0.0"
+          body: |
+            ## 📱 CineLocket iOS App (120Hz ProMotion & Mobile Optimized)
+            - 🚀 **120Hz ProMotion**: Mở khóa tần số quét cao trên iPhone 13 Pro / 14 Pro / 15 Pro / 16 Pro.
+            - ⚡ **Cảm ứng mượt mà**: Không độ trễ 300ms với `touch-action: manipulation`.
+            - 📱 **Tương thích toàn màn hình**: Hỗ trợ Dynamic Island và tai thỏ.
+            - 📷 **Quyền Camera & Thư viện**: Cho phép chụp ảnh và đăng tải video trực tiếp lên Locket.
+
+            ### 📥 Tải file trực tiếp:
+            Bấm vào liên kết **CineLocket.ipa** bên dưới để tải về máy mà không cần đăng nhập tài khoản GitHub.
+          files: build/CineLocket.ipa
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
