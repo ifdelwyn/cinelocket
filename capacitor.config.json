@@ -3,13 +3,25 @@
   "appName": "CineLocket",
   "webDir": "public",
   "bundledWebRuntime": false,
+  "backgroundColor": "#12020B",
   "server": {
     "url": "https://cinelocket.vercel.app",
-    "cleartext": true
+    "cleartext": true,
+    "allowNavigation": [
+      "cinelocket.vercel.app",
+      "*.vercel.app",
+      "*.firebaseio.com",
+      "*.googleapis.com",
+      "firebasestorage.googleapis.com",
+      "locket.cam",
+      "*.locket.camera"
+    ]
   },
   "ios": {
-    "contentInset": "always",
+    "contentInset": "automatic",
+    "preferredContentMode": "mobile",
     "allowsLinkPreview": false,
-    "scrollEnabled": true
+    "scrollEnabled": true,
+    "backgroundColor": "#12020B"
   }
 }

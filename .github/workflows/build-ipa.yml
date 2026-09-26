@@ -1,4 +1,4 @@
-name: Build CineLocket iOS IPA
+name: Build CineLocket iOS IPA (120Hz Mobile Optimized)
 
 on:
   push:
@@ -26,13 +26,23 @@ jobs:
           npx cap add ios || true
           npx cap sync ios
 
-      - name: Configure iOS Permissions (Camera & Photos)
+      - name: Configure iOS Permissions & 120Hz ProMotion Optimization
         run: |
           PLIST="ios/App/App/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string 'CineLocket can quyen truy cap camera de chup va dang anh len Locket.'" "$PLIST" || true
-          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string 'CineLocket can quyen thu vien anh de chon anh va video dang len Locket.'" "$PLIST" || true
-          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryAddUsageDescription string 'CineLocket can quyen luu anh va video ve thiet bi.'" "$PLIST" || true
+
+          # 1. Unlock 120Hz ProMotion High-Refresh Rate on iPhone & iPad Pro
+          /usr/libexec/PlistBuddy -c "Add :CADisableMinimumFrameDurationOnPhone bool true" "$PLIST" || /usr/libexec/PlistBuddy -c "Set :CADisableMinimumFrameDurationOnPhone true" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :CADisableMinimumFrameDuration bool true" "$PLIST" || /usr/libexec/PlistBuddy -c "Set :CADisableMinimumFrameDuration true" "$PLIST"
+
+          # 2. Native Camera & Photo Library Permissions
+          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string 'CineLocket cần quyền truy cập camera để chụp ảnh và quay video đăng lên Locket.'" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string 'CineLocket cần quyền truy cập thư viện để chọn ảnh và video đăng tải lên Locket.'" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryAddUsageDescription string 'CineLocket cần quyền lưu ảnh và video về thiết bị.'" "$PLIST" || true
+
+          # 3. Mobile Display & Fullscreen Optimization
+          /usr/libexec/PlistBuddy -c "Add :UIRequiresFullScreen bool true" "$PLIST" || true
           /usr/libexec/PlistBuddy -c "Add :UIViewControllerBasedStatusBarAppearance bool false" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" "$PLIST" || true
 
       - name: Build Xcode Archive (Unsigned)
         run: |
@@ -57,6 +67,6 @@ jobs:
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CineLocket-iOS-IPA
+          name: CineLocket-iOS-IPA-120Hz
           path: build/CineLocket.ipa
           retention-days: 14
